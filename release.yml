@@ -1,18 +1,8 @@
-changelog:
-  exclude:
-    labels:
-      - ignore-for-release
-    authors:
-      - HonzaVinCZ
-  categories:
-    - title: Breaking Changes 🛠
-      labels:
-        - Semver-Major
-        - breaking-change
-    - title: Exciting New Features 🎉
-      labels:
-        - Semver-Minor
-        - enhancement
-    - title: Other Changes
-      labels:
-        - "*"
+Release 1.0.1
+Changelog:
+- Mods
+- Config
+- Scripts
+- Server
+
+Release 1.0.0

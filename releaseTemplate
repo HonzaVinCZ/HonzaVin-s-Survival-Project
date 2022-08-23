@@ -1,15 +1,33 @@
---- Release 1.0.1 ---
+--- Release 2.0.4 ---
   
 --- Date ---
   
-01.01.2022
+23.08.2022
   
 --- Changelog ---
   
 > Mods
-  
-> Configs
-  
+  > Added
+    - balm-3.2.0+0
+    - bendy-lib-forge-2.1.1
+    - defaultoptions-forge-1.18.2-14.1.1
+    - emotecraft-for-MC1.18.2-2.2.0-SNAPSHOT-build.36-forge
+    - EnergyControl-forge-1.18.2-0.2.6
+    - energymeter-1.18.2-3.2.0
+    - hiddennames-1.18.2-1.0.2
+    - ironchest-1.18.2-13.1.9
+    - JustEnoughProfessions-1.18.2-1.2.2
+    - mcw-doors-1.0.6-mc1.18.2
+    - mcw-fences-1.0.6-mc1.18.2
+    - mcw-paths-1.0.0-mc1.18.2
+    - mcw-roofs-2.1.2-mc1.18.2
+    - mcw-trapdoors-1.0.7-mc1.18.2
+    - mcw-windows-2.0.3-mc1.18.2
+    - player-animation-lib-forge-0.3.0
+    - simpleplanes-1.18.2-4.14.1
+    - soundphysics-forge-1.18.2-1.0.6
+    - starlight-1.0.2+forge.546ae87
+
 > Scripts
-  
-> Server
+  > Added
+    - Some custom recipes for Simple Planes

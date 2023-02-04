@@ -1,15 +1,11 @@
---- Release 2.0.6 ---
+--- Release 2.0.7 ---
 
 --- Date ---
 
-28.12.2022
+04.02.2023
 
 --- Changelog ---
 
 > Mods updated
-> Added several mods, the most notable are;
-- Create
-- Create Additions
-- Create Big Cannons
-- Weather 2
-> Tweaked balance between Immersive Engineering and Create
+> Fixed Weather2 breaking configs (Finally)
+> Added several mods based on player's suggestions

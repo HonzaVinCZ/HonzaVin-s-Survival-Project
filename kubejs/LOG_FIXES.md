@@ -3,7 +3,44 @@
 Target: Minecraft 1.20.1, Forge 47.4.20, KubeJS 6. The existing
 `server_scripts/hvcz_server.js` gameplay changes are preserved.
 
-## Current logs: `latest(3).log` and `debug(1).log`
+## Current logs: `latest(4).log` and `debug(2).log`
+
+The server reaches `Done` at 13:03:32. Both logs describe the same startup;
+`latest` ends at 13:03:57 and `debug` at 13:04:28. This confirms the loot
+reader repair, rather than long-running stability or every recipe in game.
+
+| Check | Previous run | Current run |
+| --- | ---: | ---: |
+| KubeJS script errors | 0 | 0 |
+| Recipe parsing errors | 0 | 0 |
+| Chest loot parsing errors | 11 | 0 |
+| Unknown Thirst global loot serializer | 0 | 0 |
+| Prepared chest loot overrides | No marker | 11 |
+| KubeJS recipe fallbacks | 2 | 1 |
+| Dynmap invalid model patches | 41,110 | 41,110 |
+| Dynmap obsolete block names | 2 | 2 |
+
+The Lightman's Currency bank-table reference warning and Saro recipe fallback
+are gone. Only Incendium's empty smithing-template fallback remains; its vanilla
+recipe is preserved pending an in-game check. No additional KubeJS change is
+needed for the issues already repaired.
+
+The supplied `dynmap/renderdata` files are now included in the PR. Their repaired model/texture pairs are packaged in
+`dynmap/hvcz-renderdata-fixes.zip`; installation instructions are in `dynmap/REPAIRS.md`. Dynmap 3.7
+beta 6's actual Java face validator reproduces 42,700 rejected faces in the
+complete supplied data (including 1,590 in modules that do not load in this
+server run). The repaired data has zero rejected faces. Of these repairs,
+38,294 preserve the texture mapping; 4,406 restore the face with a whole-tile
+texture stretch. All 2,366,210 already accepted faces remain unchanged.
+The two obsolete Create controller model entries and matching texture entries
+are commented out. These are render-data repairs, not KubeJS or mod exclusions.
+A new server run and rerender are required to confirm the deployed result.
+
+The live map could not be visually inspected: the available browser upgraded
+HTTP to HTTPS and returned a gateway error saying the server does not speak
+TLS. This does not establish an outage for users opening the HTTP link.
+
+## Previous logs: `latest(3).log` and `debug(1).log`
 
 The server starts successfully. This run confirms zero KubeJS script errors,
 zero `Error parsing recipe` messages, successful Thirst serializer registration,
@@ -100,9 +137,8 @@ script too; keep the already-working startup script installed.
 
 DynmapBlockScan's supported config offers module/block exclusions, not repairs
 for invalid geometry. Excluding all 22 affected modules would discard valid map
-models too, so no broad exclusion list is added. The affected generated model
-files are absent from this repository and require a separate targeted repair or
-an updated compatible Dynmap/BlockScan build. CTM/Camera Overhaul mixins load
+models too, so no broad exclusion list is added. The generated model files supplied in the latest follow-up now have targeted
+repairs; see `dynmap/REPAIRS.md`. CTM/Camera Overhaul mixins load
 before their gameplay/render settings; disabling their config features does not
 fix client-class loading on the dedicated server. Remove those client-only jars
 from the server while retaining them on clients.
@@ -163,12 +199,11 @@ custom tables take precedence.
 
 ## Remaining issues outside these repairs
 
-- **Dynmap: 41,112 FATAL-level messages**, invalid model patches and stale block
-  names across 22 generated `dynmap/renderdata/*-models.txt` files. The server reaches `Done`
-  afterward; these are map-model failures, not a server startup crash. Check the
-  compatibility of Dynmap and DynmapBlockScan and regenerate the affected model
-  files after fixing/updating that integration. The model files are not in this
-  repository. KubeJS recipes/tags cannot repair them.
+- **Dynmap:** the current log still has 41,110 invalid-patch messages and two
+  obsolete block names. The supplied render data is repaired in this revision
+  and passes the installed release's face validator. Apply it, restart and
+  rerender before treating the server/map outcome as confirmed. Some restored
+  faces use the documented texture-stretch fallback.
 - **Immersive Vehicles/PWIC:** four truncated vehicle JSON definitions
   (`m1126`, `m1134`, `m1151`, `btr70`), missing OBJ files, and legacy model parsing
   errors. Repair/replace the affected content-pack assets. Recipe scripts run

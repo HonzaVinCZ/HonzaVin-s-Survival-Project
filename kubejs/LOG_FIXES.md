@@ -1,7 +1,9 @@
 # Server log repairs (2026-10-11)
 
 Target: Minecraft 1.20.1, Forge 47.4.20, KubeJS 6. The existing
-`server_scripts/hvcz_server.js` gameplay changes are preserved.
+`server_scripts/hvcz_server.js` gameplay changes are preserved. Additional
+TFMG steel/fluid unification lives in separate scripts; see
+[STEEL_UNIFICATION.md](STEEL_UNIFICATION.md).
 
 ## Current logs: `latest(5).log` and `debug(3).log`
 
@@ -32,8 +34,8 @@ names (`ONE` through `FIFTEEN`). The actual beta 6 binary and Saro 4.4.1 / 5.15
 enums reproduce it. This PR adds the server-only addon
 `dynmap/hvcz-dynmap-enum-fix-1.0.0.jar`; see `dynmap/ENUM_FIX.md` for installation
 and test limitations. All tested asphalt states resolve correctly after the
-patch. Server deployment and a completed render remain to be checked;
-full-height line orientation/black surfaces are still a separate open question.
+patch. The owner subsequently deployed the addon and confirmed correct heights,
+line orientation and road appearance on 2026-10-11.
 See `dynmap/SARO_ROADS.md` for the samples and changelog comparison.
 
 Remaining diagnostics include malformed Radar/TFMG tag resources, references

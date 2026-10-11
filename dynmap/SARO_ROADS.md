@@ -46,12 +46,13 @@ for installation, scope and tests. Ordinary KubeJS recipe/data scripts cannot
 correct this early Java call safely; no speculative runtime registry rewrite
 is added. Existing Saro renderdata is retained.
 
-The disappearing lowered roads can expose the underlying terrain, which is a
-plausible contributor to the brown areas in the map screenshot. That visual
-connection still needs confirmation after deployment and a completed render.
-The two `variant=default` samples do not fail this lookup. Consequently, this
-fix does **not yet establish the cause of black full-height surfaces or wrong
-line orientation**. Check those separately after the missing heights return.
+## Deployment confirmed by the owner
+
+After installing the addon, restarting and rendering, the owner reported on
+2026-10-11 that road heights, line orientation and the remaining road appearance
+all work correctly. No additional Saro texture/rotation changes are needed
+for the reported area. This is an in-game/server observation supplied by the
+owner, in addition to the isolated lookup/bytecode regression below.
 
 ## Static asset checks
 
@@ -101,7 +102,7 @@ version, including the new 64 states, and reapply/retest the beta 6 workaround
 if generated models need it. A new JAR does not refresh custom renderdata or
 existing map tiles automatically. This PR does not change the mod version.
 
-## Next visual check
+## Installation and checks for other areas
 
 1. Install the enum addon following [ENUM_FIX.md](ENUM_FIX.md), restart and
    confirm its successful-patch log marker. A KubeJS reload is insufficient.

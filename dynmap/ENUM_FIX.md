@@ -23,8 +23,8 @@ It does not contain or replace the Dynmap/Saro JARs.
    their previous appearance until rerendered.
 4. Compare the three sample coordinates in [SARO_ROADS.md](SARO_ROADS.md),
    especially the lowered `variant=6` road at **174, 67, 265**. The numeric
-   heights should now reach their existing models/textures. Full-height line
-   orientation and black surfaces still need a separate visual check.
+   heights should now reach their existing models/textures. The owner has
+   confirmed that heights, line orientation and road appearance are correct after deploying this addon on 2026-10-11.
 
 Remove the addon and restart to undo the code patch; rerender tiles to refresh
 output. Remove/review it before changing Dynmap versions: its dependency is
@@ -85,8 +85,9 @@ Minecraft's Property/BlockState boundary and Forge ASMAPI naming/logging are
 stubbed for this isolated test; actual Forge mappings were checked against the
 1.20.1 MCP configuration. Forge 47.4.20's source also confirms discovery of
 `META-INF/coremods.json` from a mod JAR. **A full Forge server startup, client
-join and visual map render have not been run here.** The successful regression
-demonstrates the state lookup correction, not every road's shading/UV output.
+join and visual map render have not been run in this workspace.** The owner
+has subsequently deployed the addon and confirmed correct road rendering.
+The successful regression demonstrates the state lookup correction, not every road's shading/UV output.
 
 To reproduce with Java 17, supply the official beta 6 source and hash-verified
 Dynmap/Saro artifacts, Nashorn 15.3 and ASM 9.5 JARs. For example, use these

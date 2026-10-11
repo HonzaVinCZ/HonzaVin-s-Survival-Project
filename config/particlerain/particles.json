@@ -1,0 +1,20 @@
+{
+  "rain": {},
+  "heavy_dust": {},
+  "splatter": {},
+  "smoke": {},
+  "streak": {},
+  "mist": {},
+  "shrub": {},
+  "snow_haze": {
+    "enabled": true
+  },
+  "mist_after_rain": {},
+  "ripple": {},
+  "rain_haze": {},
+  "snow": {},
+  "dust": {},
+  "dust_haze": {
+    "enabled": true
+  }
+}

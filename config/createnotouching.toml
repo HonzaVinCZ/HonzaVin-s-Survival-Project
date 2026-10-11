@@ -1,0 +1,108 @@
+
+[ERA]
+	#ERA block hardness (mining speed). Default: 2.0
+	#Range: 0.1 ~ 50.0
+	hardness = 2.0
+	#ERA block blast resistance (explosion protection). Default: 22.0
+	#Range: 0.0 ~ 1200.0
+	blastResistance = 22.0
+
+["Tusk ERA"]
+	#Tusk ERA block hardness (mining speed). Default: 2.0
+	#Range: 0.1 ~ 50.0
+	hardness = 2.0
+	#Tusk ERA block blast resistance (explosion protection). Default: 22.0
+	#Range: 0.0 ~ 1200.0
+	blastResistance = 22.0
+
+[APS]
+	#Enable/Disable the APS functionality
+	enabled = true
+	#APS hardness (mining speed). Default: 2.0
+	#Range: 0.1 ~ 50.0
+	hardness = 2.0
+	#APS blast resistance (explosion protection). Default: 8.0
+	#Range: 0.0 ~ 1200.0
+	blastResistance = 8.0
+	#Projectile detection range (blocks). Default: 20.0
+	#Range: 5.0 ~ 128.0
+	scanRange = 20.0
+	#Tick interval for scanning (lower = faster response). Default: 2
+	#Range: 1 ~ 20
+	tickInterval = 2
+	#Explosion power when intercepting projectiles. Default: 1.0
+	#Range: 0.1 ~ 10.0
+	explosionPower = 1.0
+	#Number sharp spawned on intercept. Default: 10
+	#Range: 1 ~ 50
+	sharpCount = 10
+
+["Iron Fist"]
+	#Enable/Disable the Iron Fist functionality
+	enabled = true
+	#Iron Fist hardness (mining speed). Default: 2.0
+	#Range: 0.1 ~ 50.0
+	hardness = 2.0
+	#Iron Fist blast resistance (explosion protection). Default: 8.0
+	#Range: 0.0 ~ 1200.0
+	blastResistance = 8.0
+	#Projectile detection radius (blocks). Default: 65.0
+	#Range: 10.0 ~ 256.0
+	scanRadius = 65.0
+	#Speed interceptor missiles. Default: 6.0
+	#Range: 1.0 ~ 20.0
+	interceptorSpeed = 6.0
+	#Cooldown between shots (ticks, 20 ticks = 1 second). Default: 200
+	#Range: 1 ~ 1200
+	cooldownTicks = 200
+	#Maximum intercept time limit (ticks). Default: 30
+	#Range: 10 ~ 200
+	maxInterceptTime = 30
+
+[Shtora]
+	#Enable/Disable the Shtora functionality
+	enabled = true
+	#Shtora hardness (mining speed). Default: 2.0
+	#Range: 0.1 ~ 50.0
+	hardness = 2.0
+	#Shtora blast resistance (explosion protection). Default: 10.0
+	#Range: 0.0 ~ 1200.0
+	blastResistance = 10.0
+	#Projectile detection range (blocks). Default: 48.0
+	#Range: 10.0 ~ 128.0
+	scanRange = 48.0
+	#Curve strength for deflecting projectiles. Default: 0.2
+	#Range: 0.01 ~ 2.0
+	curveStrength = 0.2
+	#Vertical decay rate (makes projectile fall). Default: 0.1
+	#Range: 0.0 ~ 1.0
+	yDecay = 0.1
+	#Cooldown after deflection (ticks, 20 ticks = 1 second). Default: 200
+	#Range: 1 ~ 1200
+	cooldownTicks = 200
+
+[AParryS]
+	#Enable/Disable the AParryS functionality
+	enabled = true
+	#AParryS hardness (mining speed). Default: 2.0
+	#Range: 0.1 ~ 50.0
+	hardness = 2.0
+	#AParryS blast resistance (explosion protection). Default: 8.0
+	#Range: 0.0 ~ 1200.0
+	blastResistance = 8.0
+	#Parry deflection angle (degrees). 180 = full reverse, 90 = perpendicular, 0 = no direction change
+	#Range: 0.0 ~ 180.0
+	parryAngle = 180.0
+	#Velocity multiplier when parrying. 2.0 = double speed, 1.0 = same speed, 0.5 = half speed
+	#Range: 0.1 ~ 10.0
+	parryVelocityMultiplier = 2.0
+	#Projectile detection range (blocks)
+	#Range: 1.0 ~ 64.0
+	parryScanRange = 15.0
+	#Blindness effect range when parrying (blocks)
+	#Range: 0.0 ~ 32.0
+	parryBlindRange = 10.0
+	#Blindness duration (ticks, 20 ticks = 1 second)
+	#Range: 0 ~ 100
+	parryBlindDuration = 5
+

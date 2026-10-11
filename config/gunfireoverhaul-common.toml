@@ -1,0 +1,81 @@
+
+#Settings for the ambient gunfire system, creating a 'battlefield' atmosphere.
+[Ambient]
+	#Globally enables or disables the ambient gunfire sound system.
+	enableAmbientGunfire = false
+	#Minimum time in ticks between ambient gunfire events (20 ticks = 1 second).
+	#Range: 100 ~ 72000
+	minTimeBetweenShots = 1200
+	#Maximum time in ticks between ambient gunfire events.
+	#Range: 200 ~ 72000
+	maxTimeBetweenShots = 6000
+	#Minimum distance in blocks from the player where an ambient sound can originate.
+	#Range: 100 ~ 10000
+	minGunfireDistance = 501
+	#Maximum distance in blocks from the player where an ambient sound can originate.
+	#Range: 200 ~ 10000
+	maxGunfireDistance = 5001
+
+	#
+	#Configuration for different ambient event scenarios.
+	#The chance for a scenario is (its_weight / sum_of_all_scenario_weights).
+	[Ambient.Scenarios]
+		#Weight for a standard, single shot event.
+		#Range: 0 ~ 1000
+		singleShotWeight = 70
+		#Weight for a 'Burst Fire' event (a series of shots).
+		#Range: 0 ~ 1000
+		burstFireWeight = 20
+		#Weight for a 'Full Auto' event (a rapid succession of shots).
+		#Range: 0 ~ 1000
+		fullAutoWeight = 10
+
+		#
+		#Settings for the 'Burst Fire' scenario.
+		[Ambient.Scenarios.BurstFire]
+			#Range: 2 ~ 10
+			minBurstShots = 2
+			#Range: 2 ~ 20
+			maxBurstShots = 5
+			#Range: 2 ~ 100
+			minTimeBetweenBurstShots = 5
+			#Range: 5 ~ 200
+			maxTimeBetweenBurstShots = 20
+
+		#
+		#Settings for the 'Full Auto' scenario.
+		[Ambient.Scenarios.FullAuto]
+			#Range: 3 ~ 30
+			minFullAutoShots = 5
+			#Range: 5 ~ 50
+			maxFullAutoShots = 15
+			#The fixed time in ticks between each shot in a full-auto burst.
+			#Range: 1 ~ 20
+			timeBetweenFullAutoShots = 2
+
+	#
+	#Weighted chances for shot power tiers.
+	#The chance for a tier is (its_weight / sum_of_all_weights). Set a weight to 0 to disable that tier.
+	[Ambient.Power_Tiers_Weight]
+		#Weight for 'Pistol/SMG' (Power 1-4)
+		#Range: 0 ~ 1000
+		tier1_weight = 50
+		#Weight for 'Assault Rifle' (Power 5-15)
+		#Range: 0 ~ 1000
+		tier2_weight = 25
+		#Weight for 'Battle Rifle' (Power 16-40)
+		#Range: 0 ~ 1000
+		tier3_weight = 15
+		#Weight for 'Sniper Rifle' (Power 41-80)
+		#Range: 0 ~ 1000
+		tier4_weight = 8
+		#Weight for 'Heavy Caliber' (Power 81+)
+		#Range: 0 ~ 1000
+		tier5_weight = 2
+
+	#
+	#Enable or disable specific types of ambient sound environments.
+	[Ambient.Sound_Types]
+		#Surface: A clear gunshot sound in an open area.
+		enableSurfaceSounds = true
+

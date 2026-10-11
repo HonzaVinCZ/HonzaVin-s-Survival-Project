@@ -1,0 +1,7 @@
+#List of dimensions where Elytra flight is enabled.
+#By default, Elytra is disabled everywhere.
+#If you want to enable Elytra flight in a specific dimension, add it here.
+#Example for one dimension: ["minecraft:the_end"]
+#Example for multiple dimensions: ["minecraft:the_end", "mod_id:custom_dimension"]
+enabledDimensions = []
+

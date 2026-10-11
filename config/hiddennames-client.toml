@@ -1,0 +1,8 @@
+
+#Client Settings
+[general]
+	#Show your own nametag when in 3rd person view
+	show_own = false
+	#Render animations. Will only show colored nametags (or none if hidden) if false
+	render_animations = true
+

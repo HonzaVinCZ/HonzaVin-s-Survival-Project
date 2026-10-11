@@ -1,0 +1,6 @@
+[
+  {"version":1},
+  {"ingredient":{"id":"createaddition:seed_oil"},"type":"fluid_stack","bookmarkType":"INGREDIENT"},
+  {"ingredient":{"id":"createaddition:seed_oil_bucket"},"type":"item_stack","bookmarkType":"INGREDIENT"},
+  {"ingredient":{"id":"createaddition:copper_spool"},"type":"item_stack","bookmarkType":"INGREDIENT"}
+]

@@ -1,0 +1,23 @@
+{
+  "starter": {
+    "cooldown": 86400,
+    "items": [
+      "{Count:1b,id:\"minecraft:stone_sword\",tag:{Damage:0}}",
+      "{Count:1b,id:\"minecraft:stone_pickaxe\",tag:{Damage:0}}",
+      "{Count:1b,id:\"minecraft:stone_axe\",tag:{Damage:0}}",
+      "{Count:1b,id:\"minecraft:stone_shovel\",tag:{Damage:0}}",
+      "{Count:4b,id:\"createfood:bread_lettuce_carrot\"}",
+      "{Count:1b,id:\"lightmanscurrency:wallet_copper\",tag:{Items:[]}}",
+      "{Count:1b,id:\"minecraft:shield\",tag:{Damage:0}}"
+    ]
+  },
+  "daily": {
+    "cooldown": 86400,
+    "items": [
+      "{Count:2b,id:\"lightmanscurrency:coin_gold\"}",
+      "{Count:4b,id:\"createfood:bread_lettuce_carrot\"}",
+      "{Count:2b,id:\"minecraft:iron_ingot\"}",
+      "{Count:1b,id:\"lightmanscurrency:trading_core\"}"
+    ]
+  }
+}

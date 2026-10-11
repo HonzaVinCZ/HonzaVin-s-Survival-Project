@@ -1,0 +1,57 @@
+
+["Auto Clear Settings"]
+	#Enable automatic entity clearing at set intervals
+	autoCleanEnabled = true
+	#Interval in seconds between automatic clears (default: 300 = 5 minutes)
+	#Range: 30 ~ 3600
+	autoCleanInterval = 1800
+	#Show warning messages before clearing entities
+	showWarnings = true
+	#Time in seconds before clear to show warnings (default: 30)
+	#Range: 5 ~ 120
+	warningTime = 60
+
+["Entity Filtering"]
+	#If true, only entities in the whitelist will be cleared. If false, entities in the blacklist will be cleared.
+	useWhitelistMode = false
+	#List of entity types to clear (used when whitelist mode is disabled)
+	#Format: minecraft:entity_type or modid:entity_type
+	#Examples: minecraft:zombie, minecraft:item, minecraft:arrow
+	entityBlacklist = ["minecraft:item", "minecraft:arrow", "minecraft:experience_orb", "minecraft:bat", "minecraft:zombie", "minecraft:skeleton", "minecraft:creeper", "minecraft:spider", "minecraft:enderman", "minecraft:drowned", "minecraft:phantom", "alexsmobs:underminer", "alexsmobs:fly", "alexsmobs:cockroach"]
+	#List of entity types to clear (used when whitelist mode is enabled)
+	#Format: minecraft:entity_type or modid:entity_type
+	entityWhitelist = ["minecraft:item"]
+
+["Clear Settings"]
+	#Clear dropped items
+	clearItems = true
+	#Clear hostile mobs
+	clearMobs = true
+	#Clear projectiles (arrows, snowballs, etc.)
+	clearProjectiles = true
+	#Clear boats
+	clearBoats = false
+	#Clear minecarts
+	clearMinecarts = false
+	#Clear experience orbs
+	clearXpOrbs = true
+
+["Protection Settings"]
+	#Protect entities with custom names from being cleared
+	protectNamedEntities = true
+	#Protect tamed entities (pets) from being cleared
+	protectTamedEntities = true
+	#Protect leashed entities from being cleared
+	protectLeashedEntities = true
+	#Radius around players where entities are protected (0 to disable)
+	#Range: 0 ~ 128
+	protectionRadiusPlayers = 0
+
+[Messages]
+	#Broadcast a message to all players when entities are cleared
+	broadcastClearMessage = true
+	#Message shown after clearing entities. Use {count} for entity count.
+	clearMessage = "§3[Clearlag] §fVyčištěno §b{count} §fentit!"
+	#Warning message shown before clearing. Use {time} for seconds remaining.
+	warningMessage = "§3[Clearlag] §bVarování! §fEntity budou vyčištěny za §b{time}s§f!"
+

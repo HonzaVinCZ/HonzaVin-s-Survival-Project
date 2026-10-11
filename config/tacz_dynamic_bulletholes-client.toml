@@ -1,0 +1,45 @@
+
+#Which bullet hole size each ammo uses. List ammo ids (e.g. "tacz:9mm") in the
+#matching array. Ammo not listed anywhere uses default_size.
+#You can add ammo from any mod, not just TACZ.
+[ammo]
+	#Ammo that leaves a SMALL hole (pistols / SMG rounds).
+	small_ammo = ["tacz:9mm", "tacz:45acp", "tacz:57x28", "tacz:46x30", "tacz:22lr", "tacz:22wmr", "tacz:12g"]
+	#Ammo that leaves a MID hole (intermediate / rifle rounds).
+	mid_ammo = ["tacz:338", "tacz:45_70", "tacz:30_06", "tacz:556x45", "tacz:762x39", "tacz:762x54", "tacz:308", "tacz:300aac", "tacz:58x42", "tacz:357mag", "tacz:50ae", "tacz:500mag"]
+	#Ammo that leaves a BIG hole (high-caliber / heavy rounds).
+	big_ammo = ["tacz:50bmg"]
+	#Size for ammo not listed above: small | mid | big.
+	default_size = "mid"
+
+#Appearance of the bullet hole decals.
+[appearance]
+	#Decal half-size in blocks for SMALL holes (rendered hole is ~2x this wide).
+	#Range: 0.02 ~ 4.0
+	size_small = 0.45
+	#Decal half-size in blocks for MID holes.
+	#Range: 0.02 ~ 4.0
+	size_mid = 0.45
+	#Decal half-size in blocks for BIG holes.
+	#Range: 0.02 ~ 4.0
+	size_big = 0.45
+	#How much the decal shades the hole. 0 = flat block colour (shape only),
+	#1 = full decal shading (dark centre, splinter highlights).
+	#Range: 0.0 ~ 1.0
+	hole_darkness = 1.0
+	#How long a hole stays, in ticks (20 = 1s). Default 6200 = ~5 min.
+	#Range: 2 ~ 72000
+	lifetime_ticks = 6200
+	#Fraction of the lifetime (0..1) after which the hole starts fading out.
+	#Range: 0.0 ~ 0.99
+	fade_start = 0.7
+	#Max random rotation (± degrees) applied to each hole for variety. 0 = none.
+	#Range: 0.0 ~ 180.0
+	random_rotation_degrees = 12.0
+	#Mirror the decal left<->right (use if the lit rim ends up on the wrong side).
+	flip_horizontal = false
+	#Mirror the decal up<->down (light in Minecraft comes from above).
+	flip_vertical = false
+	#Also draw TACZ's original bullet hole on top, for extra depth/darkening.
+	layer_tacz_particle = false
+

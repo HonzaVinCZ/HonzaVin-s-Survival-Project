@@ -1,0 +1,23 @@
+{
+  "Traders": [
+    {
+      "Type": "lightmanscurrency:commands",
+      "ID": "trader_1",
+      "Name": "SERVER DENNÍ ODMĚNA",
+      "OwnerName": "HonzaVinCZ",
+      "PermissionLevel": 2,
+      "Trades": [
+        {
+          "Price": {
+            "Free": true,
+            "type": "lightmanscurrency:null"
+          },
+          "Command": "kit give @s daily",
+          "Description": "Denní odměna",
+          "Tooltip": "Denní odměna"
+        }
+      ]
+    }
+  ],
+  "Auctions": []
+}

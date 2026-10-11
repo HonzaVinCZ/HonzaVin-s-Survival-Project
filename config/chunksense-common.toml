@@ -1,0 +1,34 @@
+
+#ChunkSense Configuration
+[chunk_prioritizer]
+	#Prioritize chunk loading by player view direction
+	viewAnglePriority = true
+	#Pre-load chunks along player movement vector
+	predictMovement = true
+	#How many ticks ahead to predict movement (20 ticks = 1 sec)
+	#Range: 10 ~ 100
+	predictionTicks = 40
+
+[memory_watchdog]
+	#RAM usage percent to start unloading far chunks
+	#Range: 50 ~ 99
+	memoryThreshold = 85
+	#RAM usage percent for aggressive cleanup
+	#Range: 60 ~ 99
+	criticalMemory = 95
+	#Automatically adjust render distance based on RAM
+	autoRenderDistance = true
+	#Minimum render distance (chunks)
+	#Range: 2 ~ 16
+	minRenderDistance = 4
+	#Maximum render distance (chunks)
+	#Range: 4 ~ 32
+	maxRenderDistance = 16
+	#How often to check memory (ticks, 20 = 1 sec)
+	#Range: 5 ~ 100
+	checkIntervalTicks = 20
+
+[hud]
+	#Show HUD overlay with RAM, FPS, render distance
+	showHud = true
+

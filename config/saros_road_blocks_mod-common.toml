@@ -1,0 +1,7 @@
+
+[debug]
+	#Enable verbose networking debug logging for brush tool operations
+	debugBrush = false
+	#Enable verbose debug logging for the Road Planner tool (waypoints, packets, preview, build)
+	debugRoadPlanner = false
+

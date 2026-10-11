@@ -120,6 +120,32 @@
   "ignoredRecipeTypes": [
     "cucumber:shaped_tag"
   ],
-  "ignoredRecipes": [],
+  "ignoredRecipes": [
+    "create:cutting/compat/immersiveengineering/wire_aluminum",
+    "create:cutting/compat/immersiveengineering/wire_copper",
+    "create:cutting/compat/immersiveengineering/wire_lead",
+    "create:cutting/compat/immersiveengineering/wire_steel",
+    "create_dd:crafting/steel_block_from_compacting",
+    "create_dd:crafting/steel_ingot_from_compacting",
+    "create_dd:crafting/steel_ingot_from_decompacting",
+    "create_dd:crafting/steel_nugget_from_decompacting",
+    "create_dd:crafting/tin_block_from_compacting",
+    "create_dd:crafting/tin_ingot_from_compacting",
+    "create_dd:crafting/tin_ingot_from_decompacting",
+    "create_dd:crafting/tin_nugget_from_decompacting",
+    "create_ironworks:compat/dreams_and_desires/crushing_coal_piece",
+    "create_ironworks:compat/dreams_and_desires/raw_tin_exchange",
+    "create_ironworks:compat/molten_metals/splashing/bronze_ingot_from_ceramic_mold",
+    "create_ironworks:compat/molten_metals/splashing/bronze_ingot_from_metal_mold",
+    "create_ironworks:compat/molten_metals/splashing/steel_ingot_from_ceramic_mold",
+    "create_ironworks:compat/molten_metals/splashing/steel_ingot_from_metal_mold",
+    "create_ironworks:compat/molten_metals/splashing/tin_ingot_from_ceramic_mold",
+    "create_ironworks:compat/molten_metals/splashing/tin_ingot_from_metal_mold",
+    "create_radar:crafting/identification_transponder",
+    "create_radar:crafting/plane_radar",
+    "create_radar:sequenced_assembly/network_filterer",
+    "createcasing:crafting/chain_drive/creative_from_zinc",
+    "saros_road_signs_mod:traffic_light_control_boxrez"
+  ],
   "itemsHidingJeiRei": true
 }

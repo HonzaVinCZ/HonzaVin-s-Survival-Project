@@ -1,14 +1,15 @@
 # Dynmap serialized-property fix for Saro road heights
 
-The included `hvcz-dynmap-enum-fix-1.0.0.jar` is a small **server-only Forge
+The included `hvcz-dynmap-enum-fix-1.0.1.jar` is a small **server-only Forge
 addon**, targeting Minecraft 1.20.1, Forge 47 and the installed Dynmap
 `3.7-SNAPSHOT-948` (`Dynmap-3.7-beta-6-forge-1.20.jar`). It needs no client addon.
 It does not contain or replace the Dynmap/Saro JARs.
 
 ## Install and verify
 
-1. Stop the server. Keep the existing Dynmap and Saro JARs and repaired
-   renderdata. Copy **`dynmap/hvcz-dynmap-enum-fix-1.0.0.jar` into the server's
+1. Stop the server. If upgrading, remove **only** `hvcz-dynmap-enum-fix-1.0.0.jar`
+   from `mods` so two versions of this addon are not installed together. Keep the existing Dynmap and Saro JARs and repaired
+   renderdata. Copy **`dynmap/hvcz-dynmap-enum-fix-1.0.1.jar` into the server's
    `mods` folder**. This addon is separate from `hvcz-renderdata-fixes.zip`.
 2. Start the server. Look for this successful-patch message:
 
@@ -32,7 +33,17 @@ pinned to the tested release. No world-save conversion or block replacement
 is involved.
 
 SHA-256 of the included JAR:
-`375422b8c14147d010ba2dac6e556639ea1d1a3913ad1c6d61087cefbb88fb78`.
+`7a120a8a766d1bdcf494dcac5fb1ff95e6faa535a94325c929d62bf7959313d1`.
+
+## Version 1.0.1
+
+Adds the missing `pack.mcmeta` with Minecraft 1.20.1 pack format 15. Version
+1.0.0 successfully applies the road fix, but the current server logs report
+`Missing metadata in pack mod:hvcz_dynmap_enum_fix` followed by
+`Missing data pack mod:hvcz_dynmap_enum_fix`. The transformer and its dependency
+ranges are unchanged; byte comparison against 1.0.0 confirms this. No rerender
+is needed solely for this metadata update. The packaging follows
+[Forge low-code mod guidance](https://slimeknights.github.io/docs/guides/lowcode-mod/).
 
 ## Scope
 
@@ -65,7 +76,7 @@ python tools/build_dynmap_enum_fix.py
 ```
 
 This deterministic build uses only the standard library and bundles the
-checked-in TOML, coremod manifest, JavaScript and license. No downloaded code
+checked-in TOML, pack metadata, coremod manifest, JavaScript and license. No downloaded code
 or Minecraft classes are packaged in the addon.
 
 `tests/DynmapEnumRegression.java` executes the shipped transformer in Nashorn

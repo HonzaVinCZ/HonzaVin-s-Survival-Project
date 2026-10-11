@@ -5,7 +5,78 @@ Target: Minecraft 1.20.1, Forge 47.4.20, KubeJS 6. The existing
 TFMG steel/fluid unification lives in separate scripts; see
 [STEEL_UNIFICATION.md](STEEL_UNIFICATION.md).
 
-## Current logs: `latest(5).log` and `debug(3).log`
+## Current logs: `latest(6).log` and `debug(4).log`
+
+Both files cover the same startup, 17:59:33–18:00:25. The server reaches
+`Done` at 18:00:01.287, with Dynmap's delayed initialization completing at
+18:00:23.139. These logs confirm successful loading of the previous repairs,
+not long-running stability or every recipe's in-game behavior.
+
+| Check | Current run |
+| --- | ---: |
+| KubeJS startup/server script errors and warnings | 0 |
+| `Error parsing recipe` messages | 0 |
+| Chest loot parsing errors | 0 |
+| Prepared chest loot overrides | 11 |
+| Steel recipes removed / redirected | 11 / 25 |
+| Dynmap enum patch applied | Yes |
+| Dynmap invalid patches / obsolete block names | 0 / 0 |
+| Incendium smithing-template fallback | 1 |
+| Invalid Radar/TFMG tag resources | 3 |
+| Almost Unified disabled-recipe output warnings | 25 |
+| Paladin's Furniture context warnings | 2,772 |
+
+### Follow-up changes
+
+- **Dynmap addon 1.0.1:** adds the missing `pack.mcmeta`, fixing the
+  `Missing metadata in pack mod:hvcz_dynmap_enum_fix` / `Missing data pack`
+  diagnostics introduced by addon 1.0.0. The enum transformer is byte-for-byte
+  unchanged. Replace only the old HVCZ addon; keep Dynmap itself. See
+  [ENUM_FIX.md](../dynmap/ENUM_FIX.md).
+- **Invalid tags:** two narrowly filtered server datapacks replace the three
+  `null` files before tag deserialization. This addresses the limitation of
+  ordinary KubeJS tag overrides documented below. Installation and test
+  results: [TAG_FIXES.md](../datapacks/TAG_FIXES.md). No fabricated entities
+  or items are registered.
+- **Almost Unified:** `config/almostunified/unify.json` now excludes only the
+  25 exact recipe IDs already disabled by the guarded repairs in
+  `hvcz_log_fixes.js`. Version 0.11.0 tries to inspect those condition-false
+  crafting JSON files before Forge skips them, hence the missing-output
+  warnings. `includeRecipe` filters IDs before `RecipeLink` output detection;
+  this was checked against the installed-version source tag
+  [v1.20.1-0.11.0](https://github.com/AlmostReliable/almostunified/tree/v1.20.1-0.11.0).
+  This is avoidance of an unnecessary unification pass, not restoration of
+  missing recipes. No wildcard, steel material priority or superheated mixing
+  recipe is changed. Review the exclusions if adding the optional mods/items
+  that make these specific compatibility recipes valid.
+
+Copy the revised Almost Unified config to the server and clients sharing the
+pack config, replace the HVCZ addon in the server's `mods/`, install both tag
+ZIPs as documented, and restart. A KubeJS-only reload cannot apply the addon
+update. The new tag-filter test passes against the actual Minecraft 1.20.1
+resource manager and tag codecs; JAR comparison confirms only metadata/version
+changes. A full modded startup with this follow-up is still awaiting deployment.
+
+### Remaining errors and actions
+
+| Diagnostic | Action / limitation |
+| --- | --- |
+| CTM client `ModelBakerImpl` and Camera Overhaul `Camera`, `GameRenderer`, `LocalPlayer` loaded on `DEDICATED_SERVER` | Remove `CTM-1.20.1-1.1.10.jar` and `CameraOverhaul-v2.0.6-forge+mc[1.20.0-1.20.5].jar` from the server's `mods/`; retain them on clients. Feature config toggles do not prevent these early client mixins from loading. |
+| PWIC `m1126`, `m1134`, `m1151`, `btr70` end unexpectedly while parsing JSON | Replace the affected NATO/OVD vehicle content packs with complete, compatible copies. Empty placeholder definitions would lose the vehicles. |
+| Missing `nato.obj`, `ussr.obj`, `he_koksan.obj`, `pwic_parts.obj`; official pack `engineamci4` parses `roller2` as a number; a quad mesh has no faces | Content-pack assets/legacy model compatibility need repair or a compatible pack release; KubeJS cannot reconstruct the missing models. |
+| Four missing Saro `forge:traffic_lights` entries | Still reported before late tag cleanup. A source tag fix is needed; filtering the entire shared traffic-light tag could lose other mods' valid entries. No guessed replacement IDs added. |
+| Incendium `upgrade_elytra` empty template | Vanilla fallback remains. Check smithing in game before changing its ingredients or progression. |
+| Paladin's Furniture output queried without context; Display Delight absent-food compatibility; TFMG ignored processing fields | Integration/mod-version issues remain. Recipes/items are not deleted to hide warnings, and heat/time fields are not stripped without verifying their intended behavior. |
+| Distant Horizons Twilight Forest generator warning | Existing `PRE_EXISTING_ONLY` config remains the mitigation; this warning alone does not show generation failed. |
+| Lightman's Currency empty ejection data and Carry On entity-data registration warning | Not evidence of lost traders or a server crash; no world-data deletion or placeholder state changes applied. |
+
+There is no crash in the supplied excerpt. The MTS version banner is itself
+logged at ERROR level, so total ERROR lines do not equal distinct failures.
+The brief player disconnect during delayed startup also does not establish a
+network fault. No further steel recipe changes are indicated by these logs;
+the superheated exception remains intact.
+
+## Previous logs: `latest(5).log` and `debug(3).log`
 
 The server reaches `Done` at 13:38:48.695. Both logs end at 13:57:08 with
 the surface radius render still in progress (4,500 tiles). The flat radius
@@ -32,7 +103,7 @@ samples reveal a separate Dynmap enum-serialization bug: numeric asphalt
 heights (`1` through `15`) resolve as air because Dynmap registers their Java
 names (`ONE` through `FIFTEEN`). The actual beta 6 binary and Saro 4.4.1 / 5.15
 enums reproduce it. This PR adds the server-only addon
-`dynmap/hvcz-dynmap-enum-fix-1.0.0.jar`; see `dynmap/ENUM_FIX.md` for installation
+`dynmap/hvcz-dynmap-enum-fix-1.0.1.jar`; see `dynmap/ENUM_FIX.md` for installation
 and test limitations. All tested asphalt states resolve correctly after the
 patch. The owner subsequently deployed the addon and confirmed correct heights,
 line orientation and road appearance on 2026-10-11.
@@ -231,7 +302,7 @@ regenerate their contents. Confirm `/reload` does not duplicate loot entries.
 | Saro control-box recipe has an empty output | Read that recipe's original JSON and disable it only if its result item is absent. |
 | Fifteen Thirst global loot modifiers cannot decode `thirst:add_loot_table` | During Forge registry registration, register the existing Thirst codec only if its ID is missing. Do not replace the global modifier list or discard other mods' modifiers. |
 | Four obsolete Saro's traffic-light tag entries | A guarded late tag cleanup is included, but `latest(1).log` shows LMFT has already removed/reported the missing entries before this callback. This does **not** eliminate the tag-loading message; correct the source tag in Saro's mod to remove it. |
-| TFMG's null sulfuric-acid bucket tag | Add `tfmg:sulfuric_acid_bucket` to the tag if that item exists. The malformed lower-pack resource can still produce a parse message. |
+| TFMG's null sulfuric-acid bucket tag | Add `tfmg:sulfuric_acid_bucket` to the tag if that item exists. The guarded addition alone cannot prevent the lower-pack parse message; the new filtered datapack does. |
 
 High-priority data overrides are necessary: removing recipes after the initial
 scan cannot prevent malformed JSON or missing-item deserialization errors.
@@ -259,7 +330,9 @@ custom tables take precedence.
   Radar's generated resources are empty/null. Radar also classifies entities
   through its normal `Animal`/`Enemy` checks. A higher-priority tag does not stop
   Minecraft parsing the malformed lower tag resource: tag resources are layered.
-  Correct those files in an updated mod build to eliminate the parse messages.
+  The current follow-up now supplies filtered replacement datapacks; see
+  [TAG_FIXES.md](../datapacks/TAG_FIXES.md). An ordinary higher-priority
+  tag alone still cannot eliminate the parse messages.
 - **Paladin's Furniture:** 2,849 warnings about querying dynamic recipe outputs
   without context, mostly during KubeJS recipe processing. This needs an
   integration fix; deleting the furniture recipes would break crafting. The

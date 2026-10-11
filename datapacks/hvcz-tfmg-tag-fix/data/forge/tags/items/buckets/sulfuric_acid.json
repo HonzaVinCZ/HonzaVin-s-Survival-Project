@@ -1,0 +1,9 @@
+{
+  "replace": false,
+  "values": [
+    {
+      "id": "tfmg:sulfuric_acid_bucket",
+      "required": false
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "pack": {
+    "pack_format": 15,
+    "description": "HVCZ: repair invalid TFMG sulfuric acid tags (1.20.1)"
+  },
+  "filter": {
+    "block": [
+      {
+        "namespace": "forge",
+        "path": "(tags/items/buckets/sulfuric_acid\\.json)"
+      }
+    ]
+  }
+}

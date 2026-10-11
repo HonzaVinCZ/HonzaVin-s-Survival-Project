@@ -6,7 +6,7 @@ import zipfile
 
 root = Path(__file__).resolve().parents[1]
 source = root / 'dynmap' / 'enum-fix'
-target = root / 'dynmap' / 'hvcz-dynmap-enum-fix-1.0.0.jar'
+target = root / 'dynmap' / 'hvcz-dynmap-enum-fix-1.0.1.jar'
 with zipfile.ZipFile(target, 'w', compression=zipfile.ZIP_DEFLATED, compresslevel=9) as archive:
     for path in sorted(source.rglob('*')):
         if path.is_file():

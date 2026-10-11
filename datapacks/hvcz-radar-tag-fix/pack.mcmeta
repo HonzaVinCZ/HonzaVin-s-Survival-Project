@@ -1,0 +1,14 @@
+{
+  "pack": {
+    "pack_format": 15,
+    "description": "HVCZ: repair invalid Radar tags (1.20.1)"
+  },
+  "filter": {
+    "block": [
+      {
+        "namespace": "create_radar",
+        "path": "(tags/entity_types/radar_animal\\.json|tags/entity_types/radar_hostile\\.json)"
+      }
+    ]
+  }
+}

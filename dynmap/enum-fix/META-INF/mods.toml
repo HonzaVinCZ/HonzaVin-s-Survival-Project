@@ -4,7 +4,7 @@ license="MIT"
 
 [[mods]]
 modId="hvcz_dynmap_enum_fix"
-version="1.0.0"
+version="1.0.1"
 displayName="HVCZ Dynmap Serialized Property Fix"
 description='''Fix Dynmap Forge 1.20.1 enum property names before block-state registration.'''
 displayTest="IGNORE_ALL_VERSION"

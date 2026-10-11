@@ -3,6 +3,21 @@
 Target: Minecraft 1.20.1, Forge 47.4.20, KubeJS 6. The existing
 `server_scripts/hvcz_server.js` gameplay changes are preserved.
 
+## Follow-up log: `latest(1).log`
+
+The server reaches `Done`, but the first version of these repairs fails in two
+callbacks. KubeJS's class filter rejects the direct `java.nio.file.Files` import,
+aborting the data overrides. Rhino also rejects the `const Modifier` binding
+inside the startup callback with `redeclaration of var Modifier`. Consequently,
+14 recipe parsing errors, 14 loot-table parsing errors and 15 unknown Thirst
+serializer messages remain in this run; it does not demonstrate repaired loot.
+
+The revised scripts use the built-in `JsonIO.readString(Path)` binding and `var`
+callback bindings. The original startup failure was reproduced in Rhino 2001;
+the revised script passes that same interpreter check with mocked Forge APIs.
+Install both revised scripts and perform another full restart to verify the
+changes in the actual pack.
+
 ## Install and verify
 
 Copy `server_scripts/hvcz_log_fixes.js` and
@@ -29,7 +44,7 @@ regenerate their contents. Confirm `/reload` does not duplicate loot entries.
 | Lightman's Currency IDAS bank loot references absent `quark:abacus` | Apply the same targeted entry repair. The current source table contains only an abacus; its repaired version yields no item when Quark's abacus is unavailable. Vault/other bank loot is untouched. |
 | Three Radar loot tables reference unregistered optional blocks | Empty these tables only when their associated block item is absent. |
 | Fifteen Thirst global loot modifiers cannot decode `thirst:add_loot_table` | During Forge registry registration, register the existing Thirst codec only if its ID is missing. Do not replace the global modifier list or discard other mods' modifiers. |
-| Four obsolete Saro's traffic-light tag entries | Remove only missing IDs from `forge:traffic_lights`. |
+| Four obsolete Saro's traffic-light tag entries | A guarded late tag cleanup is included, but `latest(1).log` shows LMFT has already removed/reported the missing entries before this callback. This does **not** eliminate the tag-loading message; correct the source tag in Saro's mod to remove it. |
 | TFMG's null sulfuric-acid bucket tag | Add `tfmg:sulfuric_acid_bucket` to the tag if that item exists. The malformed lower-pack resource can still produce a parse message. |
 
 High-priority data overrides are necessary: removing recipes after the initial
@@ -62,7 +77,9 @@ custom tables take precedence.
   Correct those files in an updated mod build to eliminate the parse messages.
 - **Paladin's Furniture:** 2,849 warnings about querying dynamic recipe outputs
   without context, mostly during KubeJS recipe processing. This needs an
-  integration fix; deleting the furniture recipes would break crafting.
+  integration fix; deleting the furniture recipes would break crafting. The
+  follow-up run has 2,618 such warnings; that reduction alone does not establish
+  a fix.
 - **Display Delight:** missing-food compatibility warnings, including foods
   from absent addons. Resolve in that mod's compatibility handling/version;
   registering dummy food items would conceal missing functionality.
@@ -73,17 +90,35 @@ custom tables take precedence.
 - **Distant Horizons:** Twilight Forest chunk-generator support warning.
 - **Dynmap:** additional missing textures for Lootr/Chipped and a stale Create
   block name. **Discord/JDA:** one HTTP 429, with a 536-second retry delay.
+  The follow-up log again has a 429, with a 494-second delay.
 - Forge library `mods.toml` notices, missing refmaps, and other mod-level
   warnings are not evidence of an error in the existing KubeJS script.
 
 ## Validation and limits
 
-The supplied log covers startup and about 1 hour 45 minutes afterward. The
-original KubeJS script loads with zero script errors, and the server finishes
-starting. These changes are checked with JavaScript syntax checks and a mocked
-KubeJS/Forge harness, including mod-present/absent guards, loot probability
-preservation, registration guards, and reload behavior. APIs were checked
-against the KubeJS `2001`, Thirst `1.20.1`, and Forge sources.
+The original supplied log covers startup and about 1 hour 45 minutes afterward;
+the follow-up log ends about 25 seconds after `Done` and cannot establish
+long-running stability. Both runs finish starting.
+
+Validation of the revised scripts:
+
+- JavaScript syntax checks and nine passing Node tests in
+  `tests/kubejs-log-fixes.test.cjs`, covering class-filter rejection,
+  mod-present/absent guards, loot probabilities, registration and reload behavior.
+- `tests/KubeJSRhinoSmoke.java` runs both scripts in Rhino's actual `2001`
+  interpreter, with mocked Minecraft/Forge bindings and real Java callback /
+  supplier conversion. It reproduces the original `const Modifier` failure and
+  passes with the revised startup script, then exercises data generation, tag
+  callbacks and a repeated reload. This is not a full Forge integration test.
+- APIs checked against KubeJS `2001`, Thirst `1.20.1`, and Forge sources.
+
+Run the Node checks with `node --test tests/kubejs-log-fixes.test.cjs`. To run the
+Rhino check with Rhino 2001 and its dependencies on your classpath:
+
+```sh
+javac -cp "$RHINO_TEST_CLASSPATH" -d /tmp/hvcz-rhino-test tests/KubeJSRhinoSmoke.java
+java -cp "/tmp/hvcz-rhino-test:$RHINO_TEST_CLASSPATH" KubeJSRhinoSmoke
+```
 
 This repository does not include the mod jars or a runnable dedicated server.
 An actual Forge startup/client join and in-game crafting/loot test are still
@@ -92,6 +127,8 @@ logs a warning and leaves its registries alone.
 
 Source references:
 - [KubeJS data event](https://github.com/kube-mods/kubejs/blob/2001/common/src/main/java/dev/latvian/mods/kubejs/script/data/DataPackEventJS.java)
+- [KubeJS JSON binding](https://github.com/kube-mods/kubejs/blob/2001/common/src/main/java/dev/latvian/mods/kubejs/util/JsonIO.java)
+- [KubeJS class filter and bindings](https://github.com/kube-mods/kubejs/blob/2001/common/src/main/java/dev/latvian/mods/kubejs/BuiltinKubeJSPlugin.java)
 - [KubeJS Forge event bindings](https://github.com/kube-mods/kubejs/blob/2001/forge/src/main/java/dev/latvian/mods/kubejs/forge/BuiltinKubeJSForgePlugin.java)
 - [Thirst loot codec](https://github.com/ghen-git/Thirst-Mod/blob/1.20.1/src/main/java/dev/ghen/thirst/foundation/common/loot/AddLootTableModifier.java)
 - [Thirst initialization](https://github.com/ghen-git/Thirst-Mod/blob/1.20.1/src/main/java/dev/ghen/thirst/Thirst.java)

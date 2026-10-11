@@ -4,17 +4,19 @@
 // global loot modifiers (which would also disable other mods' chest loot).
 if (Platform.isForge() && Platform.isLoaded('thirst')) {
   ForgeModEvents.onEvent('net.minecraftforge.registries.RegisterEvent', event => {
-    const key = event.getRegistryKey()
+    var key = event.getRegistryKey()
     if (String(key.location()) !== 'forge:global_loot_modifier_serializers') return
 
-    const ResourceLocation = Java.loadClass('net.minecraft.resources.ResourceLocation')
-    const id = new ResourceLocation('thirst', 'add_loot_table')
-    const registry = event.getForgeRegistry()
+    var hvczResourceLocation = Java.loadClass('net.minecraft.resources.ResourceLocation')
+    var id = new hvczResourceLocation('thirst', 'add_loot_table')
+    var registry = event.getForgeRegistry()
     if (registry === null || registry.containsKey(id)) return
 
     try {
-      const Modifier = Java.loadClass('dev.ghen.thirst.foundation.common.loot.AddLootTableModifier')
-      const codec = Modifier.CODEC.get()
+      // Rhino 2001 rejected the original const declaration here; use var for the
+      // Java class/codec bindings in this callback.
+      var hvczThirstModifierClass = Java.loadClass('dev.ghen.thirst.foundation.common.loot.AddLootTableModifier')
+      var codec = hvczThirstModifierClass.CODEC.get()
       event.register(key, id, () => codec)
       console.info('[HVCZ fixes] Registered missing thirst:add_loot_table serializer')
     } catch (error) {

@@ -2,18 +2,19 @@
 // Data overrides run BEFORE JSON/recipe deserialization. event.remove() is too late
 // for malformed JSON and missing-item errors during the initial recipe scan.
 ServerEvents.highPriorityData(event => {
-  const ModPlatform = Java.loadClass('dev.architectury.platform.Platform')
-  const Files = Java.loadClass('java.nio.file.Files')
+  var hvczModPlatform = Java.loadClass('dev.architectury.platform.Platform')
 
   // Read the installed mod's own table so its rolls, weights and valid entries
   // survive. This intentionally touches only the resources named in the log.
   function readModJson(mod, resource) {
     if (!Platform.isLoaded(mod)) return null
-    const parts = resource.split(':')
-    const path = ModPlatform.getMod(mod).findResource('data', parts[0], parts[1] + '.json')
+    var parts = resource.split(':')
+    var path = hvczModPlatform.getMod(mod).findResource('data', parts[0], parts[1] + '.json')
     if (!path.isPresent()) return null
     try {
-      return JSON.parse(String(Files.readString(path.get())))
+      // JsonIO is KubeJS's supported binding. Direct java.nio.file.Files imports
+      // are blocked by its default class filter.
+      return JSON.parse(String(JsonIO.readString(path.get())))
     } catch (error) {
       console.warn('[HVCZ fixes] Cannot read ' + resource + ': ' + error)
       return null
@@ -43,7 +44,7 @@ ServerEvents.highPriorityData(event => {
   // Stale compatibility recipes: leave them intact when their input exists.
   ;['steel', 'bronze', 'tin'].forEach(metal => {
     ;['ceramic', 'metal'].forEach(mold => {
-      const input = 'molten_metals:molten_' + metal +
+      var input = 'molten_metals:molten_' + metal +
         (mold === 'ceramic' ? '_ceramic_ingot_mold' : '_ingot_mold')
       if (!Item.exists(input)) {
         disableRecipe('create_ironworks:compat/molten_metals/splashing/' +
@@ -88,7 +89,7 @@ ServerEvents.highPriorityData(event => {
   }
 
   // Alex's Delight retained an old AMFD namespace for its cooked moose rib.
-  const rib = 'alexsdelight:singular_cooked_moose_rib'
+  var rib = 'alexsdelight:singular_cooked_moose_rib'
   if (Platform.isLoaded('alexsdelight') && !Item.exists('amfd:singular_cooked_moose_rib')) {
     if ([rib, 'farmersdelight:tomato', 'farmersdelight:onion',
          'farmersdelight:barbecue_stick'].every(id => Item.exists(id))) {
@@ -114,7 +115,7 @@ ServerEvents.highPriorityData(event => {
     if (Array.isArray(node)) return node.map(repairLootEntries)
     if (!node || typeof node !== 'object') return node
     if (node.type === 'minecraft:item' && !Item.exists(node.name)) {
-      const empty = { type: 'minecraft:empty' }
+      var empty = { type: 'minecraft:empty' }
       ;['weight', 'quality', 'conditions'].forEach(key => {
         if (node[key] !== undefined) empty[key] = node[key]
       })
@@ -128,14 +129,14 @@ ServerEvents.highPriorityData(event => {
     ;['shipwreck_supply', 'simple_dungeon', 'bastion_other',
       'abandoned_mineshaft', 'nether_bridge'].forEach(chest => {
       ;['bc', 'fr'].forEach(compat => {
-        const resource = 'thirst:loot_tables/chests/' + chest + '_' + compat
-        const table = readModJson('thirst', resource)
+        var resource = 'thirst:loot_tables/chests/' + chest + '_' + compat
+        var table = readModJson('thirst', resource)
         if (table) event.addJson(resource, repairLootEntries(table))
       })
     })
   }
-  const bank = 'lightmanscurrency:loot_tables/chest/village/idas_taiga_large_bank'
-  const bankTable = readModJson('lightmanscurrency', bank)
+  var bank = 'lightmanscurrency:loot_tables/chest/village/idas_taiga_large_bank'
+  var bankTable = readModJson('lightmanscurrency', bank)
   if (bankTable) event.addJson(bank, repairLootEntries(bankTable))
 
   // Radar ships loot for blocks that are registered only with optional addons.
@@ -153,7 +154,7 @@ ServerEvents.highPriorityData(event => {
 ServerEvents.tags('item', event => {
   // Remove the four obsolete entries only; keep traffic lights from other mods.
   ;[1, 2, 3, 5].forEach(number => {
-    const id = 'saros_road_signs_mod:trafficlight_' + number
+    var id = 'saros_road_signs_mod:trafficlight_' + number
     if (!Item.exists(id)) event.remove('forge:traffic_lights', id)
   })
   if (Item.exists('tfmg:sulfuric_acid_bucket')) {

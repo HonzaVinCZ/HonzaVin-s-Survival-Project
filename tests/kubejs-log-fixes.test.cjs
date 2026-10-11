@@ -31,7 +31,7 @@ const tableFixture = {
 }
 
 function serverHarness({ mods = ['thirst', 'lightmanscurrency', 'create_radar', 'alexsdelight'],
-  items = packItems, tables = {} } = {}) {
+  items = packItems, tables = {}, source = serverSource } = {}) {
   const callbacks = {}
   const warnings = []
   const context = {
@@ -42,6 +42,8 @@ function serverHarness({ mods = ['thirst', 'lightmanscurrency', 'create_radar', 
     Platform: { isLoaded: id => mods.includes(id) },
     Item: { exists: id => items.includes(id) },
     console: { warn: message => warnings.push(message) },
+    JsonIO: { readString: resource => typeof tables[resource] === 'string'
+      ? tables[resource] : JSON.stringify(tables[resource]) },
     Java: { loadClass: name => {
       if (name === 'dev.architectury.platform.Platform') return {
         getMod: mod => ({ findResource: (...parts) => {
@@ -49,14 +51,15 @@ function serverHarness({ mods = ['thirst', 'lightmanscurrency', 'create_radar', 
           return { isPresent: () => resource in tables, get: () => resource }
         } })
       }
-      if (name === 'java.nio.file.Files') return {
-        readString: resource => typeof tables[resource] === 'string'
-          ? tables[resource] : JSON.stringify(tables[resource])
+      // KubeJS denies java.nio/java.io imports. The original mock allowed Files
+      // and missed the real server's class-filter failure.
+      if (name.startsWith('java.nio.') || name.startsWith('java.io.')) {
+        throw Error('Class is not allowed by class filter: ' + name)
       }
       throw Error('Unexpected Java class: ' + name)
     } }
   }
-  vm.runInNewContext(serverSource, context)
+  vm.runInNewContext(source, context)
   return {
     warnings,
     reload: () => {
@@ -71,6 +74,13 @@ function serverHarness({ mods = ['thirst', 'lightmanscurrency', 'create_radar', 
     }
   }
 }
+
+test('default KubeJS class filter rejects the old Files import but supported JsonIO works', () => {
+  const oldImport = 'ServerEvents.highPriorityData(event => { Java.loadClass("java.nio.file.Files") })'
+  assert.throws(() => serverHarness({ source: oldImport }).reload(), /not allowed by class filter/)
+  assert.doesNotThrow(() => serverHarness().reload())
+  assert.doesNotMatch(serverSource, /Java\.loadClass\(['"]java\.(?:nio|io)\./)
+})
 
 test('all six malformed optional recipes are skipped before deserialization', () => {
   const { generated } = serverHarness().reload()

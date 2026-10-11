@@ -13,6 +13,7 @@ function runSteelChecks(){
   itemIds.push('test:refined_metal')
   fixtureTags['items|forge:ingots/steel'].push('test:refined_metal')
   fixtures['test:irregular']={type:'minecraft:crafting_shapeless',ingredients:[{item:'test:refined_metal'}],result:{item:'minecraft:iron_ingot'}}
+  fixtures['test:heated_alloy']={type:'create:mixing',heatRequirement:'heated',ingredients:[{item:'minecraft:iron_ingot'}],results:[{item:'create_ironworks:steel_ingot'}]}
   fixtures['test:earlier_handler']={type:'create:mixing',ingredients:[{item:'createbigcannons:steel_ingot'}],results:[{item:'createbigcannons:steel_screw_lock',count:2,chance:0.25}],processingTime:777,heatRequirement:'heated'}
   function deploy(){
     var tags=clone(fixtureTags),originals={},outputs={}
@@ -44,7 +45,18 @@ function runSteelChecks(){
   check(JSON.stringify(first)===JSON.stringify(second),'Reload changed output')
   var r=first.recipes,t=first.tags
   ;['createbigcannons:mixing/alloy_steel','createbigcannons:steel_ingot_from_nuggets','create_ironworks:materials/plates/steel_sheet','tfmg:industrial_blasting/steel_from_dust'].forEach(id=>check(r[id]===undefined,'Disabled route restored: '+id))
-  Object.keys(fixtures).filter(id=>id.indexOf('create_ironworks:materials/alloys/')===0&&contains(fixtures[id],'create_ironworks:steel_ingot')).forEach(id=>check(r[id]===undefined,'Alternative steel production: '+id))
+  var superheatedSteel=Object.keys(fixtures).filter(id=>id.indexOf('create_ironworks:materials/alloys/')===0&&fixtures[id].heatRequirement==='superheated'&&
+    (contains(fixtures[id],'create_ironworks:steel_ingot')||contains(fixtures[id],'create_ironworks:steel_nugget')))
+  check(superheatedSteel.length===6,'Missing superheated steel fixtures')
+  superheatedSteel.forEach(id=>{
+    var expected=clone(fixtures[id])
+    expected.results.forEach(output=>{
+      if(output.item==='create_ironworks:steel_ingot')output.item='tfmg:steel_ingot'
+      if(output.item==='create_ironworks:steel_nugget')output.item='tfmg:steel_nugget'
+    })
+    check(JSON.stringify(r[id])===JSON.stringify(expected),'Superheated ingredients/count/chance/heat changed: '+id)
+  })
+  check(r['test:heated_alloy']===undefined,'Ordinary heated alloying was enabled')
   ;[['block',1296,'tfmg:steel_block'],['ingot',144,'tfmg:steel_ingot'],['nugget',16,'tfmg:steel_nugget']].forEach(row=>{
     var melt=r['createbigcannons:melting/melt_steel_'+row[0]],solid=r['createbigcannons:compacting/forge_steel_'+row[0]]
     check(melt.results[0].fluid==='tfmg:molten_steel'&&melt.results[0].amount===row[1],'Incorrect melting: '+row[0])

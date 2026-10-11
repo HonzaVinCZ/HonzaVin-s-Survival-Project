@@ -119,7 +119,9 @@ ServerEvents.recipes(event => {
     var original = String(recipe.json.toString())
     var json = JSON.parse(original)
     var cbcCompacting = /^createbigcannons:compacting\/forge_steel_(block|ingot|nugget)$/.test(id)
-    if (!cbcCompacting && (duplicateOutput(json.result) || duplicateOutput(json.results))) {
+    // Explicit exception: keep superheated steel mixing, with TFMG outputs.
+    var superheatedMixing = json.type === 'create:mixing' && json.heatRequirement === 'superheated'
+    if (!cbcCompacting && !superheatedMixing && (duplicateOutput(json.result) || duplicateOutput(json.results))) {
       recipe.remove()
       removed++
       return

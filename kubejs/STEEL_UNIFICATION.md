@@ -18,10 +18,13 @@ remains unchanged. This was checked against the installed CBC 5.11.4, TFMG
 
 The script discovers registered raw materials by their standard names and
 captures members of the shared Forge/C steel material tags before normalizing
-those tags. Recipes producing duplicate raw materials are removed. Remaining
-consumers use TFMG equivalents, including nested sequenced-assembly steps.
-Ironworks' other steel-making/plate-making routes are removed rather than
-turned into shortcuts producing TFMG steel. The existing CBC alloying,
+those tags. Recipes producing duplicate raw materials are removed, except
+**superheated Create mixing recipes**: those remain available with TFMG steel
+outputs. This preserves all six installed Ironworks routes (four ingot routes
+and two nugget routes), including their ingredients, heat, quantities and
+probabilistic steel/iron/experience byproducts.
+Remaining consumers use TFMG equivalents, including nested sequenced-assembly
+steps. Other steel-making/plate-making routes are removed. The existing CBC alloying,
 CBC nugget-compacting and TFMG dust-blasting removals remain effective.
 TFMG's normal production and heavy-plate sequence remain available.
 
@@ -106,7 +109,8 @@ installed mod JARs. Its event/registry bindings are mocked. Checks cover:
 
 - CBC/TFMG melt-solidify balances, heat/time preservation and nested inputs;
 - the actual cannon-casting fluid tag and casting-time data;
-- duplicate production removal and preservation of existing restrictions;
+- the six superheated mixing exceptions, unchanged inputs/counts/chances/heat,
+  duplicate production removal and preservation of existing restrictions;
 - irregular tagged material IDs, reload consistency, recovery and bucket consumption;
 - JEI hiding, distinct Nethersteel/cannon components and absent-TFMG guards.
 

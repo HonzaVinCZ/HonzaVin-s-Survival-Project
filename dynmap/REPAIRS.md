@@ -37,8 +37,10 @@ two `Invalid texture block name` warnings.
 ## Apply
 
 The owner's `update renderdata` commit now includes these repaired pairs directly
-in `dynmap/renderdata`. The ZIP contains the same 48 files and remains an
-alternative installation method. The `latest(5).log` / `debug(3).log` server run
+in `dynmap/renderdata`. The original ZIP contains the 48 files from that face-repair snapshot and
+remains an alternative installation method. A later two-texture-file follow-up
+is documented in [TEXTURE_FIXES.md](TEXTURE_FIXES.md); apply its smaller archive
+after the original ZIP to retain the current Chipped/Lootr texture corrections. The `latest(5).log` / `debug(3).log` server run
 confirms zero invalid model-patch, obsolete model-name or obsolete texture-name
 messages. Visual correctness still needs checking: the supplied screenshot
 shows Saro road rendering problems. The new F3 samples establish a separate

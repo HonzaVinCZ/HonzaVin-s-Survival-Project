@@ -32,6 +32,9 @@ public class KubeJSRhinoSmoke {
     }
     public static class ModPack {
         public StreamSupplier getRootResource(String... paths) {
+            // ModernFix's hasResource indexes by individual path components.
+            // This deliberately catches the old reader's combined third arg.
+            for (String path : paths) if (path.contains("/")) return null;
             ZipEntry entry = ResourcePacks.jar.getEntry(String.join("/", paths));
             return entry == null ? null : () -> new TrackedStream(ResourcePacks.jar.getInputStream(entry));
         }
@@ -138,7 +141,8 @@ public class KubeJSRhinoSmoke {
                    id.indexOf('farmersdelight:') === 0 || id.indexOf('alexsdelight:') === 0) };
                 Platform.isLoaded = id => ['thirst', 'lightmanscurrency', 'create_radar', 'alexsdelight'].indexOf(id) >= 0;
                 """, "server-fixtures");
-            eval(context, scope, Files.readString(Path.of("kubejs/server_scripts/hvcz_log_fixes.js")), "server-script");
+            Path serverScript = Path.of(args.length < 2 ? "kubejs/server_scripts/hvcz_log_fixes.js" : args[1]);
+            eval(context, scope, Files.readString(serverScript), "server-script");
             eval(context, scope, """
                 var dataEvent = { addJson: (id, json) => { generated[id] = json } };
                 dataCallback(dataEvent);
@@ -150,6 +154,7 @@ public class KubeJSRhinoSmoke {
                 if (Object.keys(generated).length !== 43 || tagActions.length !== 5) throw Error('Missing repairs: '+Object.keys(generated).length);
                 dataCallback(dataEvent);
                 if (warnings.length) throw Error(warnings.join('; '));
+                if (infos.filter(x => x === '[HVCZ fixes] Prepared 11 chest loot table overrides').length !== 2) throw Error('Loot overrides were silently skipped');
                 """, "server-check");
             if (ResourcePacks.closedStreams != 22) throw new AssertionError("Unclosed resource streams: " + ResourcePacks.closedStreams);
             System.out.println("PASS: Rhino 2001 Java callbacks, actual ZIP loot streams, UTF-8, closure, tags and reload");

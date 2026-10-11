@@ -18,7 +18,10 @@ ServerEvents.highPriorityData(event => {
       // Forge's union/jar filesystem. Open the installed mod's resource through
       // Forge's resource-pack API instead. Its methods take strings, avoiding
       // forbidden Files/FML imports and the script's Path conversion entirely.
-      var resourceStream = pack.get().getRootResource('data', parts[0], parts[1] + '.json')
+      // ModernFix indexes individual path components. Passing a slash-containing
+      // third argument works in plain Forge but silently misses its cache.
+      var resourcePath = ('data/' + parts[0] + '/' + parts[1] + '.json').split('/')
+      var resourceStream = pack.get().getRootResource(resourcePath)
       if (resourceStream === null) return null
       stream = resourceStream.get()
       return JSON.parse(String(new hvczJavaString(stream.readAllBytes(), 'UTF-8')))
@@ -144,19 +147,27 @@ ServerEvents.highPriorityData(event => {
     return node
   }
 
+  var chestLootOverrides = 0
   if (Platform.isLoaded('thirst')) {
     ;['shipwreck_supply', 'simple_dungeon', 'bastion_other',
       'abandoned_mineshaft', 'nether_bridge'].forEach(chest => {
       ;['bc', 'fr'].forEach(compat => {
         var resource = 'thirst:loot_tables/chests/' + chest + '_' + compat
         var table = readModJson('thirst', resource)
-        if (table) event.addJson(resource, repairLootEntries(table))
+        if (table) {
+          event.addJson(resource, repairLootEntries(table))
+          chestLootOverrides++
+        }
       })
     })
   }
   var bank = 'lightmanscurrency:loot_tables/chest/village/idas_taiga_large_bank'
   var bankTable = readModJson('lightmanscurrency', bank)
-  if (bankTable) event.addJson(bank, repairLootEntries(bankTable))
+  if (bankTable) {
+    event.addJson(bank, repairLootEntries(bankTable))
+    chestLootOverrides++
+  }
+  console.info('[HVCZ fixes] Prepared ' + chestLootOverrides + ' chest loot table overrides')
 
   // Radar ships loot for blocks that are registered only with optional addons.
   if (Platform.isLoaded('create_radar')) {
@@ -180,7 +191,7 @@ ServerEvents.highPriorityData(event => {
   var trafficRecipe = readModJson('saros_road_signs_mod',
     'saros_road_signs_mod:recipes/traffic_light_control_boxrez')
   if (trafficRecipe && trafficRecipe.result && trafficRecipe.result.item &&
-      !Item.exists(trafficRecipe.result.item)) {
+      (trafficRecipe.result.item === 'minecraft:air' || !Item.exists(trafficRecipe.result.item))) {
     disableRecipe('saros_road_signs_mod:traffic_light_control_boxrez')
   }
 })

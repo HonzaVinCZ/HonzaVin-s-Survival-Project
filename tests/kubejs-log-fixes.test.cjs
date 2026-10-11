@@ -31,9 +31,10 @@ const tableFixture = {
 }
 
 function serverHarness({ mods = ['thirst', 'lightmanscurrency', 'create_radar', 'alexsdelight'],
-  items = packItems, tables = {}, source = serverSource } = {}) {
+  items = packItems, tables = {}, source = serverSource, cachedResources = true } = {}) {
   const callbacks = {}
   const warnings = []
+  const infos = []
   const closedStreams = []
   const context = {
     ServerEvents: {
@@ -42,7 +43,7 @@ function serverHarness({ mods = ['thirst', 'lightmanscurrency', 'create_radar', 
     },
     Platform: { isLoaded: id => mods.includes(id) },
     Item: { exists: id => items.includes(id) },
-    console: { warn: message => warnings.push(message) },
+    console: { warn: message => warnings.push(message), info: message => infos.push(message) },
     Java: { loadClass: name => {
       if (name === 'java.lang.String') return function JavaString(bytes, encoding) {
         assert.equal(encoding, 'UTF-8')
@@ -50,7 +51,11 @@ function serverHarness({ mods = ['thirst', 'lightmanscurrency', 'create_radar', 
       }
       if (name === 'net.minecraftforge.resource.ResourcePackLoader') return {
         getPackFor: mod => ({ isPresent: () => true, get: () => ({
-          getRootResource: (...parts) => {
+          getRootResource: (...args) => {
+            const parts = Array.isArray(args[0]) ? args[0] : args
+            // ModernFix hasResource walks children using each supplied string;
+            // it does not split slash-containing components like Forge does.
+            if (cachedResources && parts.some(part => part.includes('/'))) return null
             const key = mod + '/' + parts.join('/')
             if (!(key in tables)) return null
             return { get: () => ({
@@ -71,7 +76,7 @@ function serverHarness({ mods = ['thirst', 'lightmanscurrency', 'create_radar', 
   }
   vm.runInNewContext(source, context)
   return {
-    warnings, closedStreams,
+    warnings, infos, closedStreams,
     reload: () => {
       const generated = {}
       const tagActions = []
@@ -91,6 +96,30 @@ test('default KubeJS class filter rejects Files; loot reads use mod streams, not
   assert.doesNotThrow(() => serverHarness().reload())
   assert.doesNotMatch(serverSource, /Java\.loadClass\(['"]java\.(?:nio|io)\./)
   assert.doesNotMatch(serverSource, /JsonIO\.read|findResource|architectury\.platform|net\.minecraftforge\.fml\./)
+})
+
+test('ModernFix cache rejects the original combined component but the revised reader finds loot', () => {
+  const resource = 'thirst/data/thirst/loot_tables/chests/shipwreck_supply_bc.json'
+  const oldReader = `
+    ServerEvents.highPriorityData(event => {
+      var pack = Java.loadClass('net.minecraftforge.resource.ResourcePackLoader').getPackFor('thirst').get()
+      var resource = pack.getRootResource('data', 'thirst', 'loot_tables/chests/shipwreck_supply_bc.json')
+      if (resource !== null) event.addJson('test:old_reader_found_resource', {})
+    })
+    ServerEvents.tags('item', event => {})
+  `
+  const options = { tables: { [resource]: tableFixture } }
+  assert.equal(serverHarness({ ...options, source: oldReader }).reload()
+    .generated['test:old_reader_found_resource'], undefined)
+  assert.ok(serverHarness({ ...options, source: oldReader, cachedResources: false }).reload()
+    .generated['test:old_reader_found_resource'])
+  for (const cachedResources of [true, false]) {
+    const current = serverHarness({ ...options, cachedResources })
+    const generated = current.reload().generated
+    assert.equal(generated['thirst:loot_tables/chests/shipwreck_supply_bc'].pools[0].entries[1].type,
+      'minecraft:empty')
+    assert.deepEqual(current.infos, ['[HVCZ fixes] Prepared 1 chest loot table overrides'])
+  }
 })
 
 test('all six malformed optional recipes are skipped before deserialization', () => {
@@ -174,6 +203,9 @@ test('follow-up empty outputs are disabled only when their mod or item is absent
   const id = 'saros_road_signs_mod:recipes/traffic_light_control_boxrez'
   assert.deepEqual(serverHarness(options).reload().generated[id].conditions, [{ type: 'forge:false' }])
   assert.equal(serverHarness({ ...options, items: [...packItems, recipe.result.item] }).reload().generated[id], undefined)
+  assert.deepEqual(serverHarness({ ...options, items: [...packItems, 'minecraft:air'],
+    tables: { [source]: { result: { item: 'minecraft:air' } } } }).reload().generated[id].conditions,
+    [{ type: 'forge:false' }])
   // Falling back to vanilla alone does not prove Incendium's empty template
   // is broken. Keep this recipe until its intended behavior can be verified.
   assert.equal(defaults['incendium:recipes/upgrade_elytra'], undefined)
@@ -206,6 +238,7 @@ test('loot repairs retain valid entries, weights, conditions and rolls across re
   assert.equal(tableFixture.pools[0].entries[1].type, 'minecraft:item')
   assert.equal(harness.warnings.length, 0)
   assert.equal(harness.closedStreams.length, Object.keys(tables).length * 2)
+  assert.deepEqual(harness.infos, Array(2).fill('[HVCZ fixes] Prepared 11 chest loot table overrides'))
 })
 
 test('optional Radar blocks and tag entries remain intact when registered', () => {

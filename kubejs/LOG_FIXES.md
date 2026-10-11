@@ -3,7 +3,51 @@
 Target: Minecraft 1.20.1, Forge 47.4.20, KubeJS 6. The existing
 `server_scripts/hvcz_server.js` gameplay changes are preserved.
 
-## Current logs: `latest(2).log` and `debug.log`
+## Current logs: `latest(3).log` and `debug(1).log`
+
+The server starts successfully. This run confirms zero KubeJS script errors,
+zero `Error parsing recipe` messages, successful Thirst serializer registration,
+and a reduction from eleven to two KubeJS recipe fallback warnings. The moose-rib
+disable warning is gone. These startup logs do not prove every repaired crafting
+recipe works in game.
+
+The same eleven chest loot tables still fail. The reader's Java/path exceptions
+are gone, but it silently fails to find resources because ModernFix 5.26.2's
+resource cache expects separate path components. The old call supplied
+`['data', 'thirst', 'loot_tables/chests/shipwreck_supply_bc.json']`; the cache
+looks for a single child with that final slash-containing name, which does not
+exist. The debug log confirms ModernFix's resource-pack mixin is active. This
+behavior was checked against the exact `5.26.2+1.20.1` source tag, not inferred
+from the absence of exceptions alone.
+
+The revised reader supplies every component separately, e.g.
+`['data', 'thirst', 'loot_tables', 'chests', 'shipwreck_supply_bc.json']`. This
+retains the cache and reads the original mod JSON with its loot weights intact.
+The same correction also applies to Saro's recipe-resource lookup; an explicit
+air result is treated as empty even though `minecraft:air` is registered.
+
+On the next startup/reload, expect:
+
+```text
+[HVCZ fixes] Prepared 11 chest loot table overrides
+```
+
+That message was added so skipped resources cannot be mistaken for a successful
+repair. Confirm the eleven `Couldn't parse element loot_tables` messages and
+the Lightman's Currency archaeology reference warning disappear. Retest an
+unopened/new chest; previously opened chest contents are not regenerated.
+
+The two current fallback warnings are Saro's control-box recipe and Incendium's
+empty smithing template. Saro's guard now uses the corrected resource lookup;
+Incendium remains preserved for an in-game behavior check. Dynmap still emits
+41,112 FATAL model messages (41,110 invalid-patch messages and two stale block-name
+messages), and the vehicle assets, lower-pack tags and furniture warnings remain.
+DH's generator-detection warning also remains, as anticipated; the log does not
+print its active generation setting, so it does not confirm that the config was
+applied. The latest log ends about 31 seconds after `Done`, and debug logging
+continues to about 55 seconds afterward.
+
+## Previous logs: `latest(2).log` and `debug.log`
 
 These are two views of the same server run. The server reaches `Done` at
 12:25:31; the latest log ends at 12:26:56, so this is a startup check rather
@@ -15,7 +59,7 @@ than a long-running stability test.
 | Loot-table `Couldn't parse element` | 14 | 11 |
 | Unknown Thirst global loot serializer | 15 | 0 |
 | Repair script `Cannot read` messages | 0 (callback aborted) | 11 |
-| Dynmap invalid model patches | 41,112 | 41,112 |
+| Dynmap FATAL model messages | 41,112 | 41,112 |
 
 The successful Thirst registration is logged explicitly. The remaining eleven
 loot failures come from another boundary the earlier mock did not model:
@@ -119,8 +163,8 @@ custom tables take precedence.
 
 ## Remaining issues outside these repairs
 
-- **Dynmap: 41,112 FATAL-level messages**, all invalid model patches across 22
-  generated `dynmap/renderdata/*-models.txt` files. The server reaches `Done`
+- **Dynmap: 41,112 FATAL-level messages**, invalid model patches and stale block
+  names across 22 generated `dynmap/renderdata/*-models.txt` files. The server reaches `Done`
   afterward; these are map-model failures, not a server startup crash. Check the
   compatibility of Dynmap and DynmapBlockScan and regenerate the affected model
   files after fixing/updating that integration. The model files are not in this
@@ -167,7 +211,7 @@ stability. All three runs finish starting.
 
 Validation of the revised scripts:
 
-- JavaScript syntax checks and ten passing Node tests in
+- JavaScript syntax checks and eleven passing Node tests in
   `tests/kubejs-log-fixes.test.cjs`, covering class-filter rejection,
   mod-present/absent guards, loot probabilities, registration and reload behavior.
 - `tests/KubeJSRhinoSmoke.java` runs both scripts in Rhino's actual `2001`
@@ -177,7 +221,11 @@ Validation of the revised scripts:
   callbacks and a repeated reload. Its revised loot check uses real ZIP streams,
   real Java byte-array/string conversion and UTF-8 text; all 22 opened streams
   across two reloads are closed. Forge pack lookup is still mocked, so this is
-  not a full Forge integration test.
+  not a full Forge integration test. The resource-pack mock now models ModernFix's
+  separate-component lookup. The preceding full server script fails this check
+  by silently omitting loot; the corrected version prepares all eleven tables
+  on both reloads. The engine also verifies passing a JavaScript array to the
+  Java `String...` method.
 - APIs checked against KubeJS `2001`, Thirst `1.20.1`, and Forge sources.
 
 Run the Node checks with `node --test tests/kubejs-log-fixes.test.cjs`. To run the
@@ -201,6 +249,8 @@ Source references:
 - [KubeJS path conversion](https://github.com/kube-mods/kubejs/blob/2001/common/src/main/java/dev/latvian/mods/kubejs/util/UtilsJS.java)
 - [Forge 1.20.1 mod resource packs](https://github.com/MinecraftForge/MinecraftForge/blob/1.20.1/src/main/java/net/minecraftforge/resource/ResourcePackLoader.java)
 - [Forge 1.20.1 resource streams](https://github.com/MinecraftForge/MinecraftForge/blob/1.20.1/src/main/java/net/minecraftforge/resource/PathPackResources.java)
+- [ModernFix 5.26.2 resource cache interception](https://github.com/embeddedt/ModernFix/blob/a70f76a34dae74d033e486775bf4a2fec13219c3/src/main/java/org/embeddedt/modernfix/common/mixin/perf/resourcepacks/ForgePathPackResourcesMixin.java)
+- [ModernFix 5.26.2 component lookup](https://github.com/embeddedt/ModernFix/blob/a70f76a34dae74d033e486775bf4a2fec13219c3/src/main/java/org/embeddedt/modernfix/resources/PackResourcesCacheEngine.java)
 - [Alex's Delight registered items](https://github.com/Baisylia/Alexs-Delight/blob/main/src/main/java/com/ncpbails/alexsmobs/item/ModItems.java)
 - [DynmapBlockScan exclusion settings](https://github.com/webbukkit/DynmapBlockScan/blob/master/forge-1.19.3/src/main/java/org/dynmapblockscan/forge_1_19_3/DynmapBlockScanMod.java)
 - [KubeJS Forge event bindings](https://github.com/kube-mods/kubejs/blob/2001/forge/src/main/java/dev/latvian/mods/kubejs/forge/BuiltinKubeJSForgePlugin.java)

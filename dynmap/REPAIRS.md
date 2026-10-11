@@ -41,7 +41,11 @@ in `dynmap/renderdata`. The ZIP contains the same 48 files and remains an
 alternative installation method. The `latest(5).log` / `debug(3).log` server run
 confirms zero invalid model-patch, obsolete model-name or obsolete texture-name
 messages. Visual correctness still needs checking: the supplied screenshot
-shows Saro road rendering problems, investigated in [SARO_ROADS.md](SARO_ROADS.md).
+shows Saro road rendering problems. The new F3 samples establish a separate
+enum-serialization bug for lowered roads; install the additional server addon
+as described in [ENUM_FIX.md](ENUM_FIX.md). This renderdata ZIP does not include
+that addon. See [SARO_ROADS.md](SARO_ROADS.md) for the evidence and remaining
+full-height orientation question.
 
 1. Stop the server and back up its current `dynmap/renderdata` folder somewhere
    **outside** `renderdata`. Dynmap may load backup model files left there.

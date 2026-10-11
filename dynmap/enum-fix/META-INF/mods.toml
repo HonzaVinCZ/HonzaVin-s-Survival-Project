@@ -1,0 +1,31 @@
+modLoader="lowcodefml"
+loaderVersion="[47,48)"
+license="MIT"
+
+[[mods]]
+modId="hvcz_dynmap_enum_fix"
+version="1.0.0"
+displayName="HVCZ Dynmap Serialized Property Fix"
+description='''Fix Dynmap Forge 1.20.1 enum property names before block-state registration.'''
+displayTest="IGNORE_ALL_VERSION"
+
+[[dependencies.hvcz_dynmap_enum_fix]]
+modId="forge"
+mandatory=true
+versionRange="[47,48)"
+ordering="NONE"
+side="SERVER"
+
+[[dependencies.hvcz_dynmap_enum_fix]]
+modId="minecraft"
+mandatory=true
+versionRange="[1.20.1]"
+ordering="NONE"
+side="SERVER"
+
+[[dependencies.hvcz_dynmap_enum_fix]]
+modId="dynmap"
+mandatory=true
+versionRange="[3.7-SNAPSHOT-948]"
+ordering="AFTER"
+side="SERVER"

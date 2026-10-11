@@ -24,11 +24,17 @@ confirmed complete.
 
 This confirms deployment of the Dynmap repair as well as the earlier KubeJS
 repairs. The owner also committed the repaired uncompressed renderdata to the
-PR branch. The supplied screenshot still shows Saro road texture/orientation
-problems; those files were not changed by the face-validation repair. See
-`dynmap/SARO_ROADS.md` for the installed 4.4.1 asset audit, newer-release
-changelog comparison and the evidence needed to isolate an affected road state.
-No additional road mapping or mod-config change is justified by this audit alone.
+PR branch. The supplied screenshots still show Saro road texture/orientation
+problems; those files were not changed by the face-validation repair. New F3
+samples reveal a separate Dynmap enum-serialization bug: numeric asphalt
+heights (`1` through `15`) resolve as air because Dynmap registers their Java
+names (`ONE` through `FIFTEEN`). The actual beta 6 binary and Saro 4.4.1 / 5.15
+enums reproduce it. This PR adds the server-only addon
+`dynmap/hvcz-dynmap-enum-fix-1.0.0.jar`; see `dynmap/ENUM_FIX.md` for installation
+and test limitations. All tested asphalt states resolve correctly after the
+patch. Server deployment and a completed render remain to be checked;
+full-height line orientation/black surfaces are still a separate open question.
+See `dynmap/SARO_ROADS.md` for the samples and changelog comparison.
 
 Remaining diagnostics include malformed Radar/TFMG tag resources, references
 to absent Saro traffic-light items, client mixins on the dedicated server,

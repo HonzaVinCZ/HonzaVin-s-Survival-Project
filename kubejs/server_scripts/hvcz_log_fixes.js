@@ -2,22 +2,34 @@
 // Data overrides run BEFORE JSON/recipe deserialization. event.remove() is too late
 // for malformed JSON and missing-item errors during the initial recipe scan.
 ServerEvents.highPriorityData(event => {
-  var hvczModPlatform = Java.loadClass('dev.architectury.platform.Platform')
+  var hvczResourcePacks = Java.loadClass('net.minecraftforge.resource.ResourcePackLoader')
+  var hvczJavaString = Java.loadClass('java.lang.String')
 
   // Read the installed mod's own table so its rolls, weights and valid entries
   // survive. This intentionally touches only the resources named in the log.
   function readModJson(mod, resource) {
     if (!Platform.isLoaded(mod)) return null
-    var parts = resource.split(':')
-    var path = hvczModPlatform.getMod(mod).findResource('data', parts[0], parts[1] + '.json')
-    if (!path.isPresent()) return null
+    var stream = null
     try {
-      // JsonIO is KubeJS's supported binding. Direct java.nio.file.Files imports
-      // are blocked by its default class filter.
-      return JSON.parse(String(JsonIO.readString(path.get())))
+      var parts = resource.split(':')
+      var pack = hvczResourcePacks.getPackFor(mod)
+      if (!pack.isPresent()) return null
+      // JsonIO's Path wrapper accepts only the game-directory filesystem, not
+      // Forge's union/jar filesystem. Open the installed mod's resource through
+      // Forge's resource-pack API instead. Its methods take strings, avoiding
+      // forbidden Files/FML imports and the script's Path conversion entirely.
+      var resourceStream = pack.get().getRootResource('data', parts[0], parts[1] + '.json')
+      if (resourceStream === null) return null
+      stream = resourceStream.get()
+      return JSON.parse(String(new hvczJavaString(stream.readAllBytes(), 'UTF-8')))
     } catch (error) {
       console.warn('[HVCZ fixes] Cannot read ' + resource + ': ' + error)
       return null
+    } finally {
+      if (stream !== null) {
+        try { stream.close() }
+        catch (closeError) { console.warn('[HVCZ fixes] Cannot close ' + resource + ': ' + closeError) }
+      }
     }
   }
 
@@ -34,6 +46,12 @@ ServerEvents.highPriorityData(event => {
   if (!Platform.isLoaded('create_dd')) {
     disableRecipe('create_dd:crafting/tin_ingot_from_decompacting')
     disableRecipe('create_dd:crafting/tin_nugget_from_decompacting')
+    // These additional resources deserialize to empty outputs in latest(2).log.
+    ;['steel_block_from_compacting', 'steel_ingot_from_compacting',
+      'steel_nugget_from_decompacting', 'steel_ingot_from_decompacting',
+      'tin_ingot_from_compacting', 'tin_block_from_compacting'].forEach(recipe => {
+      disableRecipe('create_dd:crafting/' + recipe)
+    })
   }
   if (!Platform.isLoaded('immersiveengineering')) {
     ;['aluminum', 'copper', 'lead', 'steel'].forEach(metal => {
@@ -89,7 +107,8 @@ ServerEvents.highPriorityData(event => {
   }
 
   // Alex's Delight retained an old AMFD namespace for its cooked moose rib.
-  var rib = 'alexsdelight:singular_cooked_moose_rib'
+  var rib = Item.exists('alexsdelight:cooked_loose_moose_rib')
+    ? 'alexsdelight:cooked_loose_moose_rib' : 'alexsdelight:singular_cooked_moose_rib'
   if (Platform.isLoaded('alexsdelight') && !Item.exists('amfd:singular_cooked_moose_rib')) {
     if ([rib, 'farmersdelight:tomato', 'farmersdelight:onion',
          'farmersdelight:barbecue_stick'].every(id => Item.exists(id))) {
@@ -146,8 +165,23 @@ ServerEvents.highPriorityData(event => {
         event.addJson('create_radar:loot_tables/blocks/' + block, {
           type: 'minecraft:block', pools: []
         })
+        if (block === 'plane_radar' || block === 'identification_transponder') {
+          disableRecipe('create_radar:crafting/' + block)
+        }
       }
     })
+    if (!Item.exists('create_radar:incomplete_network_controller')) {
+      disableRecipe('create_radar:sequenced_assembly/network_filterer')
+    }
+  }
+
+  // Only the reported Saro recipe; inspect its shipped result instead of
+  // guessing a replacement ID or registering a nonfunctional placeholder.
+  var trafficRecipe = readModJson('saros_road_signs_mod',
+    'saros_road_signs_mod:recipes/traffic_light_control_boxrez')
+  if (trafficRecipe && trafficRecipe.result && trafficRecipe.result.item &&
+      !Item.exists(trafficRecipe.result.item)) {
+    disableRecipe('saros_road_signs_mod:traffic_light_control_boxrez')
   }
 })
 

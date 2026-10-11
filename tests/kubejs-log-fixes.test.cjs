@@ -12,7 +12,7 @@ const startupSource = fs.readFileSync(path.join(root, 'kubejs/startup_scripts/hv
 const clone = value => JSON.parse(JSON.stringify(value))
 const packItems = [
   'tfmg:steel_ingot', 'tfmg:steel_nugget', 'tfmg:steel_block',
-  'tfmg:sulfuric_acid_bucket', 'alexsdelight:singular_cooked_moose_rib',
+  'tfmg:sulfuric_acid_bucket', 'alexsdelight:cooked_loose_moose_rib',
   'farmersdelight:tomato', 'farmersdelight:onion', 'farmersdelight:barbecue_stick',
   'minecraft:stick', 'minecraft:cooked_chicken', 'minecraft:gold_ingot'
 ]
@@ -34,6 +34,7 @@ function serverHarness({ mods = ['thirst', 'lightmanscurrency', 'create_radar', 
   items = packItems, tables = {}, source = serverSource } = {}) {
   const callbacks = {}
   const warnings = []
+  const closedStreams = []
   const context = {
     ServerEvents: {
       highPriorityData: fn => { callbacks.data = fn },
@@ -42,18 +43,27 @@ function serverHarness({ mods = ['thirst', 'lightmanscurrency', 'create_radar', 
     Platform: { isLoaded: id => mods.includes(id) },
     Item: { exists: id => items.includes(id) },
     console: { warn: message => warnings.push(message) },
-    JsonIO: { readString: resource => typeof tables[resource] === 'string'
-      ? tables[resource] : JSON.stringify(tables[resource]) },
     Java: { loadClass: name => {
-      if (name === 'dev.architectury.platform.Platform') return {
-        getMod: mod => ({ findResource: (...parts) => {
-          const resource = mod + '/' + parts.join('/')
-          return { isPresent: () => resource in tables, get: () => resource }
-        } })
+      if (name === 'java.lang.String') return function JavaString(bytes, encoding) {
+        assert.equal(encoding, 'UTF-8')
+        return new String(Buffer.from(bytes).toString('utf8'))
+      }
+      if (name === 'net.minecraftforge.resource.ResourcePackLoader') return {
+        getPackFor: mod => ({ isPresent: () => true, get: () => ({
+          getRootResource: (...parts) => {
+            const key = mod + '/' + parts.join('/')
+            if (!(key in tables)) return null
+            return { get: () => ({
+              readAllBytes: () => Buffer.from(typeof tables[key] === 'string'
+                ? tables[key] : JSON.stringify(tables[key]), 'utf8'),
+              close: () => closedStreams.push(key)
+            }) }
+          }
+        }) })
       }
       // KubeJS denies java.nio/java.io imports. The original mock allowed Files
       // and missed the real server's class-filter failure.
-      if (name.startsWith('java.nio.') || name.startsWith('java.io.')) {
+      if (name.startsWith('java.nio.') || name.startsWith('java.io.') || name.startsWith('net.minecraftforge.fml.')) {
         throw Error('Class is not allowed by class filter: ' + name)
       }
       throw Error('Unexpected Java class: ' + name)
@@ -61,7 +71,7 @@ function serverHarness({ mods = ['thirst', 'lightmanscurrency', 'create_radar', 
   }
   vm.runInNewContext(source, context)
   return {
-    warnings,
+    warnings, closedStreams,
     reload: () => {
       const generated = {}
       const tagActions = []
@@ -75,11 +85,12 @@ function serverHarness({ mods = ['thirst', 'lightmanscurrency', 'create_radar', 
   }
 }
 
-test('default KubeJS class filter rejects the old Files import but supported JsonIO works', () => {
+test('default KubeJS class filter rejects Files; loot reads use mod streams, not jar Paths', () => {
   const oldImport = 'ServerEvents.highPriorityData(event => { Java.loadClass("java.nio.file.Files") })'
   assert.throws(() => serverHarness({ source: oldImport }).reload(), /not allowed by class filter/)
   assert.doesNotThrow(() => serverHarness().reload())
   assert.doesNotMatch(serverSource, /Java\.loadClass\(['"]java\.(?:nio|io)\./)
+  assert.doesNotMatch(serverSource, /JsonIO\.read|findResource|architectury\.platform|net\.minecraftforge\.fml\./)
 })
 
 test('all six malformed optional recipes are skipped before deserialization', () => {
@@ -131,14 +142,41 @@ test('steel recipes conserve material with 9:1 conversions and nonempty shaped k
 test('moose rib repair uses the corrected item; preserves counts; guards future fixes', () => {
   const id = 'alexsdelight:recipes/barbecue_on_a_stick'
   const recipe = serverHarness().reload().generated[id]
-  assert.equal(recipe.ingredients[2].item, 'alexsdelight:singular_cooked_moose_rib')
+  assert.equal(recipe.ingredients[2].item, 'alexsdelight:cooked_loose_moose_rib')
   assert.equal(recipe.ingredients.filter(input => input.item === 'minecraft:stick').length, 2)
   assert.equal(recipe.result.count, 2)
+  const legacy = serverHarness({ items: packItems.filter(item => item !==
+    'alexsdelight:cooked_loose_moose_rib').concat('alexsdelight:singular_cooked_moose_rib') })
+  assert.equal(legacy.reload().generated[id].ingredients[2].item, 'alexsdelight:singular_cooked_moose_rib')
   const missing = serverHarness({ items: [] })
   assert.deepEqual(missing.reload().generated[id].conditions, [{ type: 'forge:false' }])
   assert.equal(missing.warnings.length, 1)
   assert.equal(serverHarness({ items: [...packItems, 'amfd:singular_cooked_moose_rib'] })
     .reload().generated[id], undefined)
+})
+
+test('follow-up empty outputs are disabled only when their mod or item is absent', () => {
+  const ids = ['steel_block_from_compacting', 'steel_ingot_from_compacting',
+    'steel_nugget_from_decompacting', 'steel_ingot_from_decompacting',
+    'tin_ingot_from_compacting', 'tin_block_from_compacting'].map(name => 'create_dd:recipes/crafting/' + name)
+  const radarIds = ['crafting/plane_radar', 'crafting/identification_transponder',
+    'sequenced_assembly/network_filterer'].map(name => 'create_radar:recipes/' + name)
+  const defaults = serverHarness().reload().generated
+  for (const id of [...ids, ...radarIds]) assert.deepEqual(defaults[id].conditions, [{ type: 'forge:false' }])
+  const restored = serverHarness({ mods: ['create_dd', 'create_radar'], items: [...packItems,
+    'create_radar:plane_radar', 'create_radar:identification_transponder',
+    'create_radar:incomplete_network_controller'] }).reload().generated
+  for (const id of [...ids, ...radarIds]) assert.equal(restored[id], undefined)
+
+  const source = 'saros_road_signs_mod/data/saros_road_signs_mod/recipes/traffic_light_control_boxrez.json'
+  const recipe = { result: { item: 'saros_road_signs_mod:traffic_light_control_box' } }
+  const options = { mods: ['saros_road_signs_mod'], tables: { [source]: recipe } }
+  const id = 'saros_road_signs_mod:recipes/traffic_light_control_boxrez'
+  assert.deepEqual(serverHarness(options).reload().generated[id].conditions, [{ type: 'forge:false' }])
+  assert.equal(serverHarness({ ...options, items: [...packItems, recipe.result.item] }).reload().generated[id], undefined)
+  // Falling back to vanilla alone does not prove Incendium's empty template
+  // is broken. Keep this recipe until its intended behavior can be verified.
+  assert.equal(defaults['incendium:recipes/upgrade_elytra'], undefined)
 })
 
 test('loot repairs retain valid entries, weights, conditions and rolls across reloads', () => {
@@ -167,6 +205,7 @@ test('loot repairs retain valid entries, weights, conditions and rolls across re
   }
   assert.equal(tableFixture.pools[0].entries[1].type, 'minecraft:item')
   assert.equal(harness.warnings.length, 0)
+  assert.equal(harness.closedStreams.length, Object.keys(tables).length * 2)
 })
 
 test('optional Radar blocks and tag entries remain intact when registered', () => {
@@ -188,6 +227,7 @@ test('malformed source loot is reported and left alone', () => {
   } })
   assert.equal(harness.reload().generated['thirst:loot_tables/chests/shipwreck_supply_bc'], undefined)
   assert.equal(harness.warnings.length, 1)
+  assert.equal(harness.closedStreams.length, 1)
 })
 
 function startupHarness({ forge = true, thirst = true, existing = false, missingClass = false } = {}) {

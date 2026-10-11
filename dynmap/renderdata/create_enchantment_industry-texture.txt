@@ -1,0 +1,11 @@
+modname:create_enchantment_industry
+
+texture:id=disenchanter_side,filename=assets/create_enchantment_industry/textures/block/disenchanter_side.png,xcount=1,ycount=1
+texture:id=disenchanter_top,filename=assets/create_enchantment_industry/textures/block/disenchanter_top.png,xcount=1,ycount=1
+texture:id=copper_underside,filename=assets/create/textures/block/copper_underside.png,xcount=1,ycount=1
+texture:id=pump,filename=assets/create/textures/block/pump.png,xcount=1,ycount=1
+texture:id=spout,filename=assets/create/textures/block/spout.png,xcount=1,ycount=1
+texture:id=encased_pipe,filename=assets/create/textures/block/encased_pipe.png,xcount=1,ycount=1
+block:id=%disenchanter,patch0=0:disenchanter_side,patch1=0:disenchanter_top,patch2=0:copper_underside,patch3=0:pump,transparency=TRANSPARENT,stdrot=true
+block:id=%printer,patch0=0:spout,patch1=0:encased_pipe,transparency=TRANSPARENT,stdrot=true
+block:id=%blaze_enchanter,transparency=TRANSPARENT,stdrot=true

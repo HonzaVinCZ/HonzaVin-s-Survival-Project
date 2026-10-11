@@ -1,0 +1,11 @@
+modname:citadel
+
+texture:id=lectern_base,filename=assets/minecraft/textures/block/lectern_base.png,xcount=1,ycount=1
+texture:id=oak_planks,filename=assets/minecraft/textures/block/oak_planks.png,xcount=1,ycount=1
+texture:id=lectern_sides,filename=assets/minecraft/textures/block/lectern_sides.png,xcount=1,ycount=1
+texture:id=lectern_front,filename=assets/minecraft/textures/block/lectern_front.png,xcount=1,ycount=1
+texture:id=lectern_top,filename=assets/minecraft/textures/block/lectern_top.png,xcount=1,ycount=1
+block:id=%lectern,state=facing:north,patch0=0:lectern_base,patch1=0:oak_planks,patch2=0:lectern_sides,patch3=0:lectern_front,patch4=0:lectern_top,transparency=TRANSPARENT,stdrot=true
+block:id=%lectern,state=facing:south,patch0=0:lectern_base,patch1=0:oak_planks,patch2=0:lectern_sides,patch3=0:lectern_front,patch4=0:lectern_top,transparency=TRANSPARENT,stdrot=true
+block:id=%lectern,state=facing:west,patch0=0:lectern_base,patch1=0:oak_planks,patch2=0:lectern_sides,patch3=0:lectern_front,patch4=0:lectern_top,transparency=TRANSPARENT,stdrot=true
+block:id=%lectern,state=facing:east,patch0=0:lectern_base,patch1=0:oak_planks,patch2=0:lectern_sides,patch3=0:lectern_front,patch4=0:lectern_top,transparency=TRANSPARENT,stdrot=true

@@ -452,7 +452,7 @@ block:id=%twilight_portal,state=is_one_way:true,patch0=0:nether_portal,patch1=0:
 block:id=%twilight_portal,state=is_one_way:false,patch0=0:nether_portal,transparency=SEMITRANSPARENT,stdrot=true
 block:id=%hedge,patch0=0:hedge,patch1=0:hedge,patch2=0:hedge,patch3=0:hedge,patch4=0:hedge,patch5=0:hedge,stdrot=true
 block:id=%firefly_jar,patch0=0:jar_side,patch1=0:jar_top,patch2=0:jar_bottom,patch3=0:firefly_jar_cork,transparency=SEMITRANSPARENT,stdrot=true
-block:id=%firefly_particle_spawner,patch0=0:jar_side,patch1=0:jar_top,patch2=0:jar_bottom,patch3=0:composter_compost,patch4=0:poppy,transparency=SEMITRANSPARENT,stdrot=true
+block:id=%firefly_particle_spawner,patch0=0:jar_side,patch1=0:jar_top,patch2=0:jar_bottom,patch3=0:composter_compost,patch4=0:poppy,transparency=SEMITRANSPARENT,stdrot=true,patch5=4000:jar_top
 block:id=%cicada_jar,patch0=0:jar_side,patch1=0:jar_top,patch2=0:jar_bottom,patch3=0:cicada_jar_cork,transparency=SEMITRANSPARENT,stdrot=true
 block:id=%moss_patch,transparency=TRANSPARENT,stdrot=true
 block:id=%mayapple,patch0=0:mayapple_side,patch1=0:mayapple,transparency=TRANSPARENT,stdrot=true
@@ -4155,10 +4155,10 @@ block:id=%blue_castle_door,state=active:true/vanish:true,transparency=TRANSPAREN
 block:id=%blue_castle_door,state=active:true/vanish:false,transparency=TRANSPARENT,stdrot=true
 block:id=%blue_castle_door,state=active:false/vanish:true,transparency=TRANSPARENT,stdrot=true
 block:id=%blue_castle_door,state=active:false/vanish:false,transparency=TRANSPARENT,stdrot=true
-block:id=%twilight_portal_miniature_structure,state=facing:north,patch0=0:stone,patch1=0:dirt,patch2=1000:grass_block_top,patch3=1000:grass_block_side_overlay,patch4=0:nether_portal,patch5=0:poppy,transparency=TRANSPARENT,stdrot=true
-block:id=%twilight_portal_miniature_structure,state=facing:south,patch0=0:stone,patch1=0:dirt,patch2=1000:grass_block_top,patch3=1000:grass_block_side_overlay,patch4=0:nether_portal,patch5=0:poppy,transparency=TRANSPARENT,stdrot=true
-block:id=%twilight_portal_miniature_structure,state=facing:west,patch0=0:stone,patch1=0:dirt,patch2=1000:grass_block_top,patch3=1000:grass_block_side_overlay,patch4=0:nether_portal,patch5=0:poppy,transparency=TRANSPARENT,stdrot=true
-block:id=%twilight_portal_miniature_structure,state=facing:east,patch0=0:stone,patch1=0:dirt,patch2=1000:grass_block_top,patch3=1000:grass_block_side_overlay,patch4=0:nether_portal,patch5=0:poppy,transparency=TRANSPARENT,stdrot=true
+block:id=%twilight_portal_miniature_structure,state=facing:north,patch0=0:stone,patch1=0:dirt,patch2=1000:grass_block_top,patch3=1000:grass_block_side_overlay,patch4=0:nether_portal,patch5=0:poppy,transparency=TRANSPARENT,stdrot=true,patch6=17000:grass_block_side_overlay
+block:id=%twilight_portal_miniature_structure,state=facing:south,patch0=0:stone,patch1=0:dirt,patch2=1000:grass_block_top,patch3=1000:grass_block_side_overlay,patch4=0:nether_portal,patch5=0:poppy,transparency=TRANSPARENT,stdrot=true,patch6=17000:grass_block_side_overlay
+block:id=%twilight_portal_miniature_structure,state=facing:west,patch0=0:stone,patch1=0:dirt,patch2=1000:grass_block_top,patch3=1000:grass_block_side_overlay,patch4=0:nether_portal,patch5=0:poppy,transparency=TRANSPARENT,stdrot=true,patch6=17000:grass_block_side_overlay
+block:id=%twilight_portal_miniature_structure,state=facing:east,patch0=0:stone,patch1=0:dirt,patch2=1000:grass_block_top,patch3=1000:grass_block_side_overlay,patch4=0:nether_portal,patch5=0:poppy,transparency=TRANSPARENT,stdrot=true,patch6=17000:grass_block_side_overlay
 block:id=%naga_courtyard_miniature_structure,state=facing:north,patch0=0:dirt,patch1=1000:grass_block_top,patch2=0:stone,patch3=1000:grass_block_side_overlay,patch4=0:stone_bricks,patch5=0:smooth_stone_slab_side,patch6=0:smooth_stone,patch7=0:mossy_stone_bricks,transparency=TRANSPARENT,stdrot=true
 block:id=%naga_courtyard_miniature_structure,state=facing:south,patch0=0:dirt,patch1=1000:grass_block_top,patch2=0:stone,patch3=1000:grass_block_side_overlay,patch4=0:stone_bricks,patch5=0:smooth_stone_slab_side,patch6=0:smooth_stone,patch7=0:mossy_stone_bricks,transparency=TRANSPARENT,stdrot=true
 block:id=%naga_courtyard_miniature_structure,state=facing:west,patch0=0:dirt,patch1=1000:grass_block_top,patch2=0:stone,patch3=1000:grass_block_side_overlay,patch4=0:stone_bricks,patch5=0:smooth_stone_slab_side,patch6=0:smooth_stone,patch7=0:mossy_stone_bricks,transparency=TRANSPARENT,stdrot=true
@@ -6404,9 +6404,9 @@ block:id=%potted_time_sapling,patch0=0:flower_pot,patch1=0:dirt,patch2=0:time_sa
 block:id=%potted_transformation_sapling,patch0=0:flower_pot,patch1=0:dirt,patch2=0:transformation_sapling,transparency=TRANSPARENT,stdrot=true
 block:id=%potted_mining_sapling,patch0=0:flower_pot,patch1=0:dirt,patch2=0:mining_sapling,transparency=TRANSPARENT,stdrot=true
 block:id=%potted_sorting_sapling,patch0=0:flower_pot,patch1=0:dirt,patch2=0:sorting_sapling,transparency=TRANSPARENT,stdrot=true
-block:id=%potted_mayapple,patch0=0:flower_pot,patch1=0:dirt,patch2=0:mayapple_side,patch3=0:mayapple,transparency=TRANSPARENT,stdrot=true
+block:id=%potted_mayapple,patch0=0:flower_pot,patch1=0:dirt,patch2=0:mayapple_side,patch3=0:mayapple,transparency=TRANSPARENT,stdrot=true,patch4=4000:flower_pot
 block:id=%potted_fiddlehead,patch0=0:flower_pot,patch1=0:dirt,patch2=1000:potted_fiddlehead,transparency=TRANSPARENT,stdrot=true
 block:id=%potted_mushgloom,patch0=0:flower_pot,patch1=0:dirt,patch2=0:potted_mushgloom,transparency=TRANSPARENT,stdrot=true
-block:id=%potted_thorn,patch0=0:flower_pot,patch1=0:brown_thorns_side,patch2=0:brown_thorns_top,transparency=TRANSPARENT,stdrot=true
-block:id=%potted_green_thorn,patch0=0:flower_pot,patch1=0:green_thorns_side,patch2=0:green_thorns_top,transparency=TRANSPARENT,stdrot=true
-block:id=%potted_dead_thorn,patch0=0:flower_pot,patch1=0:burnt_thorns_side,patch2=0:burnt_thorns_top,transparency=TRANSPARENT,stdrot=true
+block:id=%potted_thorn,patch0=0:flower_pot,patch1=0:brown_thorns_side,patch2=0:brown_thorns_top,transparency=TRANSPARENT,stdrot=true,patch3=4000:flower_pot
+block:id=%potted_green_thorn,patch0=0:flower_pot,patch1=0:green_thorns_side,patch2=0:green_thorns_top,transparency=TRANSPARENT,stdrot=true,patch3=4000:flower_pot
+block:id=%potted_dead_thorn,patch0=0:flower_pot,patch1=0:burnt_thorns_side,patch2=0:burnt_thorns_top,transparency=TRANSPARENT,stdrot=true,patch3=4000:flower_pot

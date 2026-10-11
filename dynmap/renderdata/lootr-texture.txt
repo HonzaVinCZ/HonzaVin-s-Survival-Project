@@ -14,7 +14,7 @@ block:id=%lootr_barrel,state=facing:up/open:true,stdrot=true
 block:id=%lootr_barrel,state=facing:up/open:false,stdrot=true
 block:id=%lootr_barrel,state=facing:down/open:true,stdrot=true
 block:id=%lootr_barrel,state=facing:down/open:false,stdrot=true
-block:id=%trophy,state=facing:north,patch0=0:steve,patch1=0:lootr:chest_opened,transparency=TRANSPARENT,stdrot=true
-block:id=%trophy,state=facing:south,patch0=0:steve,patch1=0:lootr:chest_opened,transparency=TRANSPARENT,stdrot=true
-block:id=%trophy,state=facing:west,patch0=0:steve,patch1=0:lootr:chest_opened,transparency=TRANSPARENT,stdrot=true
-block:id=%trophy,state=facing:east,patch0=0:steve,patch1=0:lootr:chest_opened,transparency=TRANSPARENT,stdrot=true
+block:id=%trophy,state=facing:north,patch0=0:steve,patch1=0:lootr:chest_opened,transparency=TRANSPARENT,stdrot=true,patch2=4000:steve,patch3=4000:lootr:chest_opened
+block:id=%trophy,state=facing:south,patch0=0:steve,patch1=0:lootr:chest_opened,transparency=TRANSPARENT,stdrot=true,patch2=4000:steve,patch3=4000:lootr:chest_opened
+block:id=%trophy,state=facing:west,patch0=0:steve,patch1=0:lootr:chest_opened,transparency=TRANSPARENT,stdrot=true,patch2=4000:steve,patch3=4000:lootr:chest_opened
+block:id=%trophy,state=facing:east,patch0=0:steve,patch1=0:lootr:chest_opened,transparency=TRANSPARENT,stdrot=true,patch2=4000:steve,patch3=4000:lootr:chest_opened

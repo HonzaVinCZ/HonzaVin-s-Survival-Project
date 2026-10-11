@@ -10,7 +10,7 @@ texture:id=mulberry_pie_side,filename=assets/create_central_kitchen/textures/blo
 texture:id=mulberry_pie_top,filename=assets/create_central_kitchen/textures/block/mulberry_pie_top.png,xcount=1,ycount=1
 texture:id=mulberry_pie_bottom,filename=assets/create_central_kitchen/textures/block/mulberry_pie_bottom.png,xcount=1,ycount=1
 texture:id=mulberry_pie_inner,filename=assets/create_central_kitchen/textures/block/mulberry_pie_inner.png,xcount=1,ycount=1
-block:id=%blaze_stove,patch0=0:blaze_heater_brazier,patch1=0:blaze_stove_top,transparency=TRANSPARENT,stdrot=true
+block:id=%blaze_stove,patch0=0:blaze_heater_brazier,patch1=0:blaze_stove_top,transparency=TRANSPARENT,stdrot=true,patch2=4000:blaze_heater_brazier
 block:id=%pumpkin_pie,state=bites:0/facing:north,patch0=0:pie_side,patch1=0:pumpkin_pie_top,patch2=0:pie_bottom,transparency=TRANSPARENT,stdrot=true
 block:id=%pumpkin_pie,state=bites:0/facing:south,patch0=0:pie_side,patch1=0:pumpkin_pie_top,patch2=0:pie_bottom,transparency=TRANSPARENT,stdrot=true
 block:id=%pumpkin_pie,state=bites:0/facing:west,patch0=0:pie_side,patch1=0:pumpkin_pie_top,patch2=0:pie_bottom,transparency=TRANSPARENT,stdrot=true

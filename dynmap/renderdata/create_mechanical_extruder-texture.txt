@@ -5,7 +5,7 @@ texture:id=andesite_casing,filename=assets/create/textures/block/andesite_casing
 texture:id=extruder_top,filename=assets/create_mechanical_extruder/textures/block/extruder_top.png,xcount=1,ycount=1
 texture:id=gearbox,filename=assets/create/textures/block/gearbox.png,xcount=1,ycount=1
 texture:id=funnel_closed,filename=assets/create/textures/block/funnel_closed.png,xcount=1,ycount=1
-block:id=%mechanical_extruder,state=facing:north,patch0=0:andesite_tunnel_top_window,patch1=0:andesite_casing,patch2=0:extruder_top,patch3=0:gearbox,patch4=0:funnel_closed,transparency=TRANSPARENT,stdrot=true
-block:id=%mechanical_extruder,state=facing:south,patch0=0:andesite_tunnel_top_window,patch1=0:andesite_casing,patch2=0:extruder_top,patch3=0:gearbox,patch4=0:funnel_closed,transparency=TRANSPARENT,stdrot=true
-block:id=%mechanical_extruder,state=facing:west,patch0=0:andesite_tunnel_top_window,patch1=0:andesite_casing,patch2=0:extruder_top,patch3=0:gearbox,patch4=0:funnel_closed,transparency=TRANSPARENT,stdrot=true
-block:id=%mechanical_extruder,state=facing:east,patch0=0:andesite_tunnel_top_window,patch1=0:andesite_casing,patch2=0:extruder_top,patch3=0:gearbox,patch4=0:funnel_closed,transparency=TRANSPARENT,stdrot=true
+block:id=%mechanical_extruder,state=facing:north,patch0=0:andesite_tunnel_top_window,patch1=0:andesite_casing,patch2=0:extruder_top,patch3=0:gearbox,patch4=0:funnel_closed,transparency=TRANSPARENT,stdrot=true,patch5=4000:andesite_casing
+block:id=%mechanical_extruder,state=facing:south,patch0=0:andesite_tunnel_top_window,patch1=0:andesite_casing,patch2=0:extruder_top,patch3=0:gearbox,patch4=0:funnel_closed,transparency=TRANSPARENT,stdrot=true,patch5=4000:andesite_casing
+block:id=%mechanical_extruder,state=facing:west,patch0=0:andesite_tunnel_top_window,patch1=0:andesite_casing,patch2=0:extruder_top,patch3=0:gearbox,patch4=0:funnel_closed,transparency=TRANSPARENT,stdrot=true,patch5=4000:andesite_casing
+block:id=%mechanical_extruder,state=facing:east,patch0=0:andesite_tunnel_top_window,patch1=0:andesite_casing,patch2=0:extruder_top,patch3=0:gearbox,patch4=0:funnel_closed,transparency=TRANSPARENT,stdrot=true,patch5=4000:andesite_casing

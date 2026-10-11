@@ -36,6 +36,13 @@ two `Invalid texture block name` warnings.
 
 ## Apply
 
+The owner's `update renderdata` commit now includes these repaired pairs directly
+in `dynmap/renderdata`. The ZIP contains the same 48 files and remains an
+alternative installation method. The `latest(5).log` / `debug(3).log` server run
+confirms zero invalid model-patch, obsolete model-name or obsolete texture-name
+messages. Visual correctness still needs checking: the supplied screenshot
+shows Saro road rendering problems, investigated in [SARO_ROADS.md](SARO_ROADS.md).
+
 1. Stop the server and back up its current `dynmap/renderdata` folder somewhere
    **outside** `renderdata`. Dynmap may load backup model files left there.
 2. Extract `dynmap/hvcz-renderdata-fixes.zip` from this PR. Copy its `renderdata`
@@ -66,8 +73,10 @@ python tools/repair_dynmap_models.py dynmap/renderdata
 python tools/repair_dynmap_models.py dynmap/renderdata --apply --allow-texture-stretch
 ```
 
-The uncompressed renderdata committed by the user is retained as the original
-snapshot. Use the ZIP to install the repair, or run the helper on that snapshot.
+The current uncompressed renderdata already contains the repair. To reproduce
+the before/after comparison, obtain the original snapshot from commit
+`cb31c9c437df73277b97d24e87f093ee4e359a27`. Do not compare the current repaired
+directory against itself as the original input.
 
 `tests/DynmapModelRegression.java` compares original and repaired data using
 the actual release's `PatchDefinition`: every repaired face passes; every

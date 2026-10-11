@@ -3,7 +3,42 @@
 Target: Minecraft 1.20.1, Forge 47.4.20, KubeJS 6. The existing
 `server_scripts/hvcz_server.js` gameplay changes are preserved.
 
-## Current logs: `latest(4).log` and `debug(2).log`
+## Current logs: `latest(5).log` and `debug(3).log`
+
+The server reaches `Done` at 13:38:48.695. Both logs end at 13:57:08 with
+the surface radius render still in progress (4,500 tiles). The flat radius
+render completes at 13:45:15 with 4,096 tiles; the surface render is not yet
+confirmed complete.
+
+| Check | Previous run | Current run |
+| --- | ---: | ---: |
+| KubeJS script errors | 0 | 0 |
+| `Error parsing recipe` | 0 | 0 |
+| Chest loot parsing errors | 0 | 0 |
+| Unknown Thirst global loot serializer | 0 | 0 |
+| Prepared chest loot overrides | 11 | 11 |
+| Incendium recipe fallback | 1 | 1 |
+| Dynmap invalid model patches | 41,110 | 0 |
+| Dynmap obsolete model block names | 2 | 0 |
+| Dynmap obsolete texture block names | 2 | 0 |
+
+This confirms deployment of the Dynmap repair as well as the earlier KubeJS
+repairs. The owner also committed the repaired uncompressed renderdata to the
+PR branch. The supplied screenshot still shows Saro road texture/orientation
+problems; those files were not changed by the face-validation repair. See
+`dynmap/SARO_ROADS.md` for the installed 4.4.1 asset audit, newer-release
+changelog comparison and the evidence needed to isolate an affected road state.
+No additional road mapping or mod-config change is justified by this audit alone.
+
+Remaining diagnostics include malformed Radar/TFMG tag resources, references
+to absent Saro traffic-light items, client mixins on the dedicated server,
+and the vehicle packs' truncated JSON/missing OBJ assets. During rendering,
+Dynmap also reports missing Lootr Steve and Chipped `0.png` / `1.png` resources.
+These three texture warnings are separate from the resolved obsolete block-name
+warnings and do not identify a Saro road texture failure. Incendium's empty
+smithing-template recipe still falls back to vanilla and needs an in-game check.
+
+## Previous logs: `latest(4).log` and `debug(2).log`
 
 The server reaches `Done` at 13:03:32. Both logs describe the same startup;
 `latest` ends at 13:03:57 and `debug` at 13:04:28. This confirms the loot

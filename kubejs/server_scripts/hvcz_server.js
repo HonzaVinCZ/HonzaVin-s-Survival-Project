@@ -9,7 +9,7 @@
 ServerEvents.recipes(event => {
 
 //CREATE RADARS RADAR FUZE
-  event.remove({ output: 'create_radar:guided_fuze' })
+event.remove({ output: 'create_radar:guided_fuze' })
 event.shaped(
   Item.of('create_radar:guided_fuze', 1),
   [
@@ -221,7 +221,7 @@ event.replaceInput(
   'tfmg:screw'
 )
 
-//CBC AP ROUND
+//CBC AP AC ROUND
 event.remove({ output: 'createbigcannons:ap_autocannon_round' })
 event.shaped(
   Item.of('createbigcannons:ap_autocannon_round', 2),
@@ -235,6 +235,33 @@ event.shaped(
     B: '#forge:plates/iron'
   }
 )
+
+//CBC AP SHELL
+event.remove({ output: 'createbigcannons:ap_shell' })
+event.recipes.create.mechanical_crafting('createbigcannons:ap_shell', [
+  ' I ',
+  'ISI',
+  'IGI',
+  ' W '
+], {
+  I: '#forge:ingots/iron',
+  S: '#forge:ingots/steel',
+  G: 'createbigcannons:packed_guncotton',
+  W: '#minecraft:wooden_slabs'
+})
+
+//CBC AP SHOT
+event.remove({ output: 'createbigcannons:ap_shot' })
+event.recipes.create.mechanical_crafting('createbigcannons:ap_shot', [
+  ' I ',
+  'ISI',
+  'ISI',
+  ' W '
+], {
+  I: '#forge:ingots/iron',
+  S: '#forge:ingots/steel',
+  W: '#minecraft:wooden_slabs'
+})
 
 //LC TANK BY CREATE TANK REPLACEMENT
 event.replaceInput(

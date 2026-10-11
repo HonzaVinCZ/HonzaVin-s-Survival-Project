@@ -1,0 +1,4 @@
+modname:thirst
+
+texture:id=sand_filter,filename=assets/thirst/textures/block/sand_filter.png,xcount=1,ycount=1
+block:id=%sand_filter,patch0=0:sand_filter,transparency=TRANSPARENT,stdrot=true

@@ -231,7 +231,9 @@ _version = 4
 		# but may cause server/simulation lag. 
 		# Note: unlike other modes this option DOES save generated chunks to 
 		# Minecraft's region files.
-		distantGeneratorMode = "SURFACE"
+		# Twilight Forest's custom generator is unsupported by distant generation.
+		# Keep LODs for existing chunks; explore/pregenerate chunks before viewing them.
+		distantGeneratorMode = "PRE_EXISTING_ONLY"
 		#
 		# How should distant generator progress be displayed? 
 		# 

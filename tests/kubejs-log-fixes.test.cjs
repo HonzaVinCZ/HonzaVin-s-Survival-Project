@@ -263,49 +263,36 @@ test('malformed source loot is reported and left alone', () => {
   assert.equal(harness.closedStreams.length, 1)
 })
 
-function startupHarness({ forge = true, thirst = true, existing = false, missingClass = false } = {}) {
-  let callback
-  const warnings = [], registrations = [], codec = {}, infos = []
-  function ResourceLocation(namespace, name) { this.id = namespace + ':' + name }
-  vm.runInNewContext(startupSource, {
-    Platform: { isForge: () => forge, isLoaded: () => thirst },
-    ForgeModEvents: { onEvent: (name, fn) => { callback = fn } },
-    console: { warn: msg => warnings.push(msg), info: msg => infos.push(msg) },
-    Java: { loadClass: name => {
-      if (name === 'net.minecraft.resources.ResourceLocation') return ResourceLocation
-      if (missingClass) throw Error('Missing class')
-      return { CODEC: { get: () => codec } }
-    } }
-  })
-  return { warnings, registrations, infos, codec, hasListener: Boolean(callback),
-    fire: (name = 'forge:global_loot_modifier_serializers') => {
-      if (!callback) return
-      const key = { location: () => name }
-      callback({ getRegistryKey: () => key,
-        getForgeRegistry: () => ({ containsKey: () => existing || registrations.length > 0 }),
-        register: (registryKey, id, supplier) => registrations.push({ key: registryKey, id: id.id, codec: supplier() })
-      })
+test('retired startup workaround cannot register the recursive Thirst codec', () => {
+  vm.runInNewContext(startupSource, {})
+  assert.doesNotMatch(startupSource, /Java\.loadClass|ForgeModEvents\.onEvent/)
+})
+
+test('all 15 Thirst modifiers retain conditions and table IDs with a non-recursive type', () => {
+  const tables = {}, originals = {}
+  for (const chest of ['shipwreck_supply', 'simple_dungeon', 'bastion_other', 'abandoned_mineshaft', 'nether_bridge']) {
+    for (const suffix of ['', '_bc', '_fr']) {
+      const name = 'add_loot_' + chest + suffix
+      const modifier = {type: 'thirst:add_loot_table', conditions: [
+        {condition: 'forge:loot_table_id', loot_table_id: 'minecraft:chests/' + chest}
+      ], lootTable: 'thirst:chests/' + chest + suffix, custom_field: 'preserve me'}
+      tables['thirst/data/thirst/loot_modifiers/' + name + '.json'] = modifier
+      originals['thirst:loot_modifiers/' + name] = modifier
     }
   }
-}
-
-test('Thirst serializer registers only on Forge in the correct registry when missing', () => {
-  const harness = startupHarness()
-  harness.fire('minecraft:item')
-  assert.equal(harness.registrations.length, 0)
-  harness.fire()
-  assert.equal(harness.registrations.length, 1)
-  assert.equal(harness.registrations[0].id, 'thirst:add_loot_table')
-  assert.equal(harness.registrations[0].codec, harness.codec)
-  harness.fire()
-  assert.equal(harness.registrations.length, 1)
-  for (const options of [{ forge: false }, { thirst: false }, { existing: true }]) {
-    const skip = startupHarness(options)
-    skip.fire()
-    assert.equal(skip.registrations.length, 0)
+  const harness = serverHarness({mods: ['thirst', 'farmersdelight'], tables})
+  const first = harness.reload().generated
+  const second = harness.reload().generated
+  for (const [id, original] of Object.entries(originals)) {
+    assert.deepEqual(first[id], {...original, type: 'farmersdelight:add_loot_table'})
+    assert.deepEqual(second[id], first[id])
   }
-  const changedMod = startupHarness({ missingClass: true })
-  changedMod.fire()
-  assert.equal(changedMod.registrations.length, 0)
-  assert.equal(changedMod.warnings.length, 1)
+  assert.equal(harness.warnings.length, 0)
+  assert.equal(harness.closedStreams.length, 30)
+  assert.equal(harness.infos.filter(x => x.includes('Prepared 15 non-recursive')).length, 2)
+  const skipped = serverHarness({mods: ['thirst'], tables}).reload().generated
+  assert.equal(Object.keys(skipped).filter(id => id.includes(':loot_modifiers/')).length, 0)
+  const missing = serverHarness({mods: ['thirst', 'farmersdelight']})
+  missing.reload()
+  assert.equal(missing.warnings.length, 1)
 })

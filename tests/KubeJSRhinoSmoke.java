@@ -90,6 +90,7 @@ public class KubeJSRhinoSmoke {
         context.evaluateString(scope, source, name, 1, null);
     }
     public static void main(String[] args) throws Exception {
+        if (args.length < 3) throw new IllegalArgumentException("Supply startup script, server script and Thirst 1.4.0 JAR; optional fourth arg exports repaired modifiers");
         Path jarPath = Files.createTempFile("hvcz-loot-fixture-", ".jar");
         String fixture = """
             {"type":"minecraft:chest","pools":[{"rolls":1,"entries":[
@@ -103,6 +104,18 @@ public class KubeJSRhinoSmoke {
                     zip.putNextEntry(new ZipEntry("data/thirst/loot_tables/chests/" + chest + "_" + compat + ".json"));
                     zip.write(fixture.getBytes(StandardCharsets.UTF_8));
                     zip.closeEntry();
+                }
+            }
+            try (ZipFile thirst = new ZipFile(args[2])) {
+                for (String chest : new String[]{"shipwreck_supply", "simple_dungeon", "bastion_other", "abandoned_mineshaft", "nether_bridge"}) {
+                    for (String suffix : new String[]{"", "_bc", "_fr"}) {
+                        String name = "data/thirst/loot_modifiers/add_loot_" + chest + suffix + ".json";
+                        zip.putNextEntry(new ZipEntry(name));
+                        try (InputStream input = thirst.getInputStream(thirst.getEntry(name))) {
+                            zip.write(input.readAllBytes());
+                        }
+                        zip.closeEntry();
+                    }
                 }
             }
             zip.putNextEntry(new ZipEntry("data/lightmanscurrency/loot_tables/chest/village/idas_taiga_large_bank.json"));
@@ -124,10 +137,9 @@ public class KubeJSRhinoSmoke {
             Path startup = Path.of(args.length == 0 ? "kubejs/startup_scripts/hvcz_thirst_loot_fix.js" : args[0]);
             eval(context, scope, Files.readString(startup), "startup-script");
             Event event = new Event();
-            events.callback.accept(event);
-            events.callback.accept(event);
+            if (events.callback != null) throw new AssertionError("Unsafe startup registration was restored");
             eval(context, scope, "if (warnings.length) throw Error(warnings.join('; '));", "startup-check");
-            if (event.registrations != 1) throw new AssertionError("Expected one registration, got " + event.registrations);
+            if (event.registrations != 0) throw new AssertionError("Retired script registered a codec");
 
             // Forge resource objects are fakes, but reading bytes, decoding UTF-8,
             // closing streams and Java overload conversion use real ZIP/JDK objects.
@@ -139,7 +151,7 @@ public class KubeJSRhinoSmoke {
                 var Item = { exists: id => id.indexOf('absent:') !== 0 &&
                   (id.indexOf('tfmg:') === 0 || id.indexOf('minecraft:') === 0 ||
                    id.indexOf('farmersdelight:') === 0 || id.indexOf('alexsdelight:') === 0) };
-                Platform.isLoaded = id => ['thirst', 'lightmanscurrency', 'create_radar', 'alexsdelight'].indexOf(id) >= 0;
+                Platform.isLoaded = id => ['thirst', 'farmersdelight', 'lightmanscurrency', 'create_radar', 'alexsdelight'].indexOf(id) >= 0;
                 """, "server-fixtures");
             Path serverScript = Path.of(args.length < 2 ? "kubejs/server_scripts/hvcz_log_fixes.js" : args[1]);
             eval(context, scope, Files.readString(serverScript), "server-script");
@@ -151,12 +163,21 @@ public class KubeJSRhinoSmoke {
                 if (loot.pools[0].entries[1].type !== 'minecraft:empty' || loot.pools[0].entries[1].weight !== 7) throw Error('Loot repair failed');
                 if (loot.fixture_note !== 'UTF-8: příliš žluťoučký') throw Error('UTF-8 decoding failed');
                 if (generated['tconstruct:recipes/common/materials/steel_nugget_from_ingot'].result.count !== 9) throw Error('Steel repair failed');
-                if (Object.keys(generated).length !== 43 || tagActions.length !== 5) throw Error('Missing repairs: '+Object.keys(generated).length);
+                if (Object.keys(generated).length !== 58 || tagActions.length !== 5) throw Error('Missing repairs: '+Object.keys(generated).length);
+                Object.keys(generated).filter(id => id.indexOf(':loot_modifiers/') >= 0).forEach(id => {
+                  if (generated[id].type !== 'farmersdelight:add_loot_table') throw Error('Unsafe modifier: ' + id);
+                });
                 dataCallback(dataEvent);
                 if (warnings.length) throw Error(warnings.join('; '));
                 if (infos.filter(x => x === '[HVCZ fixes] Prepared 11 chest loot table overrides').length !== 2) throw Error('Loot overrides were silently skipped');
                 """, "server-check");
-            if (ResourcePacks.closedStreams != 22) throw new AssertionError("Unclosed resource streams: " + ResourcePacks.closedStreams);
+            if (args.length > 3) {
+                String output = context.toString(context.evaluateString(scope,
+                    "var modifierOutput = {}; Object.keys(generated).filter(id => id.indexOf(':loot_modifiers/') >= 0).forEach(id => { modifierOutput[id] = generated[id] }); JSON.stringify(modifierOutput)",
+                    "modifier-output", 1, null));
+                Files.writeString(Path.of(args[3]), output);
+            }
+            if (ResourcePacks.closedStreams != 52) throw new AssertionError("Unclosed resource streams: " + ResourcePacks.closedStreams);
             System.out.println("PASS: Rhino 2001 Java callbacks, actual ZIP loot streams, UTF-8, closure, tags and reload");
         } finally {
             Files.deleteIfExists(jarPath);

@@ -55,6 +55,18 @@ heat fields are unchanged. No additional steel or KubeJS recipe changes are
 indicated by these logs, and the superheated exception is retained.
 
 ## Previous logs: `latest(6).log` and `debug(4).log`
+## Chest-opening crash: 2026-10-17
+
+The new shipwreck crash is a `StackOverflowError` in Thirst's recursive global
+loot modifier. The previous serializer registration workaround enabled that
+runtime bug. It is retired and replaced with 15 early JSON overrides using
+Farmer's Delight's non-recursive handler, preserving the original definitions
+apart from their type. See [THIRST_LOOT_CRASH.md](THIRST_LOOT_CRASH.md) for the
+required two-script replacement, restart, FD config dependency and stronger
+runtime-binary regression. The older startup-only confirmations below did not
+establish chest-opening safety.
+
+## Current logs: `latest(6).log` and `debug(4).log`
 
 Both files cover the same startup, 17:59:33–18:00:25. The server reaches
 `Done` at 18:00:01.287, with Dynmap's delayed initialization completing at
@@ -325,11 +337,14 @@ startup failure was also reproduced in Rhino 2001.
 Copy `server_scripts/hvcz_log_fixes.js` and
 `startup_scripts/hvcz_thirst_loot_fix.js` into the corresponding KubeJS folders.
 Apply the Distant Horizons config change above on the server.
-Install the startup script on **both server and clients**, then fully restart
-both. `/reload` is insufficient for the serializer registration.
+The 2026-10-17 startup file intentionally retires the unsafe serializer hook;
+replace the old file and fully restart the server. Keep client/pack copies
+consistent if using them for singleplayer. `/reload` alone cannot remove an
+already registered codec. Keep FD's `generateFDChestLoot = true` (already set).
 
-On startup, expect no KubeJS script errors and, if Thirst still lacks its
-serializer, `[HVCZ fixes] Registered missing thirst:add_loot_table serializer`.
+On startup, expect zero KubeJS script errors and
+`[HVCZ fixes] Prepared 15 non-recursive Thirst loot modifiers`. The old
+`Registered missing thirst:add_loot_table serializer` message must disappear.
 Verify that steel ingots/nuggets/blocks convert at 9:1 in both directions, and
 that the moose-rib barbecue recipe works when its corrected ingredient exists.
 Check newly generated/unopened chest loot; previously opened chests do not
@@ -349,7 +364,7 @@ regenerate their contents. Confirm `/reload` does not duplicate loot entries.
 | Three Radar loot tables reference unregistered optional blocks | Empty these tables only when their associated block item is absent. |
 | Radar crafting outputs or network-filter intermediate item is absent | Disable only the reported recipes whose associated item is missing. |
 | Saro control-box recipe has an empty output | Read that recipe's original JSON and disable it only if its result item is absent. |
-| Fifteen Thirst global loot modifiers cannot decode `thirst:add_loot_table` | During Forge registry registration, register the existing Thirst codec only if its ID is missing. Do not replace the global modifier list or discard other mods' modifiers. |
+| Fifteen Thirst global loot modifiers cannot decode `thirst:add_loot_table` | Replace the 15 modifier JSON types with FD's compatible raw-table handler. The earlier registry workaround is retired after the chest-opening recursion crash; preserve the global list and other mods' modifiers. |
 | Four obsolete Saro's traffic-light tag entries | A guarded late tag cleanup is included, but `latest(1).log` shows LMFT has already removed/reported the missing entries before this callback. This does **not** eliminate the tag-loading message; correct the source tag in Saro's mod to remove it. |
 | TFMG's null sulfuric-acid bucket tag | Add `tfmg:sulfuric_acid_bucket` to the tag if that item exists. The guarded addition alone cannot prevent the lower-pack parse message; the new filtered datapack does. |
 
@@ -411,21 +426,19 @@ stability. All three runs finish starting.
 
 Validation of the revised scripts:
 
-- JavaScript syntax checks and eleven passing Node tests in
+- JavaScript syntax checks and twelve passing Node tests in
   `tests/kubejs-log-fixes.test.cjs`, covering class-filter rejection,
   mod-present/absent guards, loot probabilities, registration and reload behavior.
-- `tests/KubeJSRhinoSmoke.java` runs both scripts in Rhino's actual `2001`
-  interpreter, with mocked Minecraft/Forge bindings and real Java callback /
-  supplier conversion. It reproduces the original `const Modifier` failure and
-  passes with the revised startup script, then exercises data generation, tag
-  callbacks and a repeated reload. Its revised loot check uses real ZIP streams,
-  real Java byte-array/string conversion and UTF-8 text; all 22 opened streams
-  across two reloads are closed. Forge pack lookup is still mocked, so this is
-  not a full Forge integration test. The resource-pack mock now models ModernFix's
-  separate-component lookup. The preceding full server script fails this check
-  by silently omitting loot; the corrected version prepares all eleven tables
-  on both reloads. The engine also verifies passing a JavaScript array to the
-  Java `String...` method.
+- `tests/KubeJSRhinoSmoke.java` runs both scripts in real Rhino 2001 with
+  mocked Minecraft/Forge bindings, real ZIP streams/UTF-8 conversion, all 15
+  actual Thirst modifier definitions, the eleven loot overrides and repeated
+  reload. All 52 resource streams close. Forge pack lookup models ModernFix's
+  separate-component lookup. It verifies that the retired startup script no
+  longer registers a codec.
+- `tests/ThirstLootRecursionRegression.java` executes the actual mod codecs and
+  bytecode with isolated boundary stubs, reproduces the original recursion and
+  verifies all five chest types with the repaired definitions. See the crash
+  document for its scope and reproduction commands.
 - APIs checked against KubeJS `2001`, Thirst `1.20.1`, and Forge sources.
 
 Run the Node checks with `node --test tests/kubejs-log-fixes.test.cjs`. To run the
@@ -433,13 +446,15 @@ Rhino check with Rhino 2001 and its dependencies on your classpath:
 
 ```sh
 javac -cp "$RHINO_TEST_CLASSPATH" -d /tmp/hvcz-rhino-test tests/KubeJSRhinoSmoke.java
-java -cp "/tmp/hvcz-rhino-test:$RHINO_TEST_CLASSPATH" KubeJSRhinoSmoke
+java -cp "/tmp/hvcz-rhino-test:$RHINO_TEST_CLASSPATH" KubeJSRhinoSmoke \
+  kubejs/startup_scripts/hvcz_thirst_loot_fix.js \
+  kubejs/server_scripts/hvcz_log_fixes.js "$THIRST_JAR"
 ```
 
 This repository does not include the mod jars or a runnable dedicated server.
 An actual Forge startup/client join and in-game crafting/loot test are still
-required. If a different Thirst build moves its codec class, the startup script
-logs a warning and leaves its registries alone.
+required. Review unexpected modifier-count warnings after mod updates; the
+startup script no longer registers any serializer.
 
 Source references:
 - [KubeJS data event](https://github.com/kube-mods/kubejs/blob/2001/common/src/main/java/dev/latvian/mods/kubejs/script/data/DataPackEventJS.java)

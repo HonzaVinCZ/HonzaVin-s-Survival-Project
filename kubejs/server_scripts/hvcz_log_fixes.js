@@ -169,6 +169,32 @@ ServerEvents.highPriorityData(event => {
   }
   console.info('[HVCZ fixes] Prepared ' + chestLootOverrides + ' chest loot table overrides')
 
+  // Thirst 1.4.0 calls getRandomItems() from inside a global loot modifier.
+  // Forge retains the original queried table ID, so its condition matches again
+  // and recursively reapplies the entire modifier chain until StackOverflowError.
+  // Farmer's Delight uses getRandomItemsRaw() with a stack splitter instead.
+  // Its codec has the same conditions/lootTable schema; retain all other data.
+  if (Platform.isLoaded('thirst') && Platform.isLoaded('farmersdelight')) {
+    var safeThirstModifiers = 0
+    ;['shipwreck_supply', 'simple_dungeon', 'bastion_other',
+      'abandoned_mineshaft', 'nether_bridge'].forEach(chest => {
+      ;['', '_bc', '_fr'].forEach(suffix => {
+        var resource = 'thirst:loot_modifiers/add_loot_' + chest + suffix
+        var modifier = readModJson('thirst', resource)
+        if (modifier && modifier.type === 'thirst:add_loot_table' &&
+            typeof modifier.lootTable === 'string' && Array.isArray(modifier.conditions)) {
+          modifier.type = 'farmersdelight:add_loot_table'
+          event.addJson(resource, modifier)
+          safeThirstModifiers++
+        }
+      })
+    })
+    console.info('[HVCZ fixes] Prepared ' + safeThirstModifiers + ' non-recursive Thirst loot modifiers')
+    if (safeThirstModifiers !== 15) {
+      console.warn('[HVCZ fixes] Expected 15 Thirst loot modifiers; review the installed mod resources')
+    }
+  }
+
   // Radar ships loot for blocks that are registered only with optional addons.
   if (Platform.isLoaded('create_radar')) {
     ;['plane_radar', 'identification_transponder', 'radar_guidance_block'].forEach(block => {

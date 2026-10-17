@@ -5,6 +5,56 @@ Target: Minecraft 1.20.1, Forge 47.4.20, KubeJS 6. The existing
 TFMG steel/fluid unification lives in separate scripts; see
 [STEEL_UNIFICATION.md](STEEL_UNIFICATION.md).
 
+## Current logs: `latest(7).log` and `debug(5).log`
+
+Both files cover the same startup and short rendering interval, from 19:05:46
+through 19:07:22. The server reaches `Done` at 19:06:16.836; Dynmap completes
+its delayed initialization at 19:06:39.202. No crash appears in this excerpt.
+
+| Check | Previous run | Current run |
+| --- | ---: | ---: |
+| KubeJS startup/server script errors | 0 | 0 |
+| Chest loot parsing errors | 0 | 0 |
+| Prepared chest loot overrides | 11 | 11 |
+| Invalid Radar/TFMG tag resources | 3 | 0 |
+| HVCZ addon metadata/data-pack warnings | 2 | 0 |
+| Almost Unified disabled-recipe output warnings | 25 | 0 |
+| Steel recipes removed / redirected | 11 / 25 | 11 / 25 |
+| Dynmap enum transformer applied | Yes | Yes |
+| Dynmap invalid model patches / obsolete block names | 0 / 0 | 0 / 0 |
+| Incendium recipe fallback | 1 | 1 |
+| Paladin's Furniture context warnings | 2,772 | 2,772 |
+
+Both new tag ZIPs load automatically. This confirms successful deployment of
+PR #2's fixes. Forge also warns that the saved HVCZ addon version changed from
+1.0.0 to 1.0.1. That version notice is expected for the metadata-only upgrade;
+the transformer/dependencies were unchanged and the success marker is present.
+The supplied interval does not prove long-running stability or crafting/casting
+behavior in game.
+
+### Additional Dynmap texture repairs
+
+The render thread reports missing Lootr Steve and Chipped `0.png` / `1.png`
+textures. These appeared in an older rendering log too; they are separate from
+the repaired Saro road issue. Inspection of the exact Chipped 3.0.7 JAR identifies
+two literal numeric face aliases and their intended declared textures. The
+follow-up corrects 24 Chipped lantern-state mappings and uses Dynmap's bundled
+classic Steve skin for Lootr's trophy. Geometry, UVs and the working road patch
+remain unchanged. Installation and validation:
+[TEXTURE_FIXES.md](../dynmap/TEXTURE_FIXES.md).
+
+### Remaining issues
+
+CTM and Camera Overhaul are still installed on the dedicated server and produce
+the same client-class errors. The four truncated PWIC vehicle definitions,
+missing vehicle OBJ files, official vehicle model issues, Saro's four obsolete
+traffic-light entries and Incendium's empty smithing template also persist.
+The actions/limitations listed in the previous audit below still apply.
+Display Delight missing-food compatibility warnings and TFMG ignored duration/
+heat fields are unchanged. No additional steel or KubeJS recipe changes are
+indicated by these logs, and the superheated exception is retained.
+
+## Previous logs: `latest(6).log` and `debug(4).log`
 ## Chest-opening crash: 2026-10-17
 
 The new shipwreck crash is a `StackOverflowError` in Thirst's recursive global
